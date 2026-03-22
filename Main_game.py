@@ -1,15 +1,13 @@
 from random import *
-
 #flash ideas
 #personaje medico de la plaga
-#arreglar ataque2 healer
 #arreglar def eleminar_cargas
 #hacer que def purificar tmb quite los efectos por tiempo malos
 
 personajesgrupal = 'Warrior, Warrior Tank, Magician, Hereje, Maldi, Thief, Shapeshifter, Healer, Mace, Fires, Snake Charner, Apostador, Natural, Natural Heal, Diablillo, Support, Chiquitin, Guadaña, Crossbow, Loco, Root, Santa Claus, Werewolf, Runeforge'
 
 def printdatos (me, enemy):
-    print ('A', enemy.name, 'le quedan', enemy.health, 'punti vita,', enemy.energy, 'punti energia, il suo potere è', enemy.power, ', la sua difesa è', enemy.defense,'e la sua velocità è', enemy.velocity,', ha', enemy.cargas['hemorragia'], 'hemorragias,', enemy.cargas['sangrado'], 'sangrados,', enemy.cargas['quemado'], 'quemaduras,', enemy.cargas['cura'], 'cargas de cura,', enemy.cargas['veneno'], 'cargas de veneno', enemy.cargas['maldita'], 'cargas malditas y está', enemy.cargas['hielo'] + enemy.cargas['stun'] + enemy.cargas['paralizado'], 'turnos congelados/stuneados/paralizados')
+    print ('A', enemy.name, 'le quedan', enemy.health, 'puntos de vida,', enemy.energy, 'puntos de energia, su poder es de', enemy.power, ', su defensa es de', enemy.defense,'y su velocidad de', enemy.velocity,', tiene', enemy.cargas['hemorragia'], 'hemorragias,', enemy.cargas['sangrado'], 'sangrados,', enemy.cargas['quemado'], 'quemaduras,', enemy.cargas['cura'], 'cargas de cura,', enemy.cargas['veneno'], 'cargas de veneno', enemy.cargas['maldita'], 'cargas malditas y está', enemy.cargas['hielo'] + enemy.cargas['stun'] + enemy.cargas['paralizado'], 'turnos congelados/stuneados/paralizados')
     print ('Tienes', me.health, 'puntos de vida, tu poder es de', me.power, ', tu defensa es de', me.defense,'y tu velocidad de', me.velocity, ', te quedan', me.energy, 'puntos de energía, tienes', me.cargas['hemorragia'], 'hemorragias,', me.cargas['sangrado'], 'sangrados,', me.cargas['quemado'], 'quemaduras,', me.cargas['cura'],'cargas de cura,', me.cargas['veneno'], 'cargas de veneno y', me.cargas['maldita'], 'cargas malditas y estás', me.cargas['hielo'] + me.cargas['stun'] + me.cargas['paralizado'], 'turnos congelados/stuneados/paralizados', '\n')
 
 def printdatosIT (me, enemy):
@@ -17,7 +15,7 @@ def printdatosIT (me, enemy):
     print ('Hai', me.health, 'punti vita, il tuo potere è', me.power, ', la tua difesa è', me.defense,'e la tua velocità è', me.velocity, ', ti restano', me.energy, 'punti energia, hai', me.cargas['hemorragia'], 'emorragie,', me.cargas['sangrado'], 'sanguinamenti,', me.cargas['quemado'], 'ustioni,', me.cargas['cura'],'cariche di guarigione,', me.cargas['veneno'], 'cariche di veleno e', me.cargas['maldita'], 'cariche maledette e sei per', me.cargas['hielo'] + me.cargas['stun'] + me.cargas['paralizado'], 'turni congelato/stordito/paralizzato', '\n')
 
 def printdatosshapeshifter (me, enemy):
-    print ('A', enemy.name, 'le quedan', enemy.health, 'puntos de vida,', enemy.energy, 'puntos de energia, su poder es de', enemy.power, ', su defensa es de', enemy.defense,'y su velocidad de', enemy.velocity,',y tiene', enemy.cargas['hemorragia'], 'hemorragias,', enemy.cargas['sangrado'], 'sangrados,', enemy.cargas['quemado'], 'quemaduras,', enemy.cargas['cura'], 'cargas de cura,', enemy.cargas['veneno'], 'cargas de veneno', enemy.cargas['maldita'], 'cargas malditas y está', enemy.cargas['hielo'] + enemy.cargas['stun'] + enemy.cargas['paralizado'], 'turnos congelados/stuneados/paralizados')
+    print ('A', enemy.name, 'le quedan', enemy.health, 'puntos de vida,', enemy.energy, 'puntos de energia, su poder es de', enemy.power, ', su defensa es de', enemy.defense,'y su velocidad de', enemy.velocity,', tiene', enemy.cargas['hemorragia'], 'hemorragias,', enemy.cargas['sangrado'], 'sangrados,', enemy.cargas['quemado'], 'quemaduras,', enemy.cargas['cura'], 'cargas de cura,', enemy.cargas['veneno'], 'cargas de veneno', enemy.cargas['maldita'], 'cargas malditas y está', enemy.cargas['hielo'] + enemy.cargas['stun'] + enemy.cargas['paralizado'], 'turnos congelados/stuneados/paralizados')
     print ('Tienes', me.health, 'puntos de vida, tu poder es de', me.power, ', tu defensa es de', me.defense,'y tu velocidad de', me.velocity, ', te quedan', me.energy, 'puntos de energía, tienes', me.cargas['hemorragia'], 'hemorragias,', me.cargas['sangrado'], 'sangrados,', me.cargas['quemado'], 'quemaduras,', me.cargas['cura'],'cargas de cura,', me.cargas['veneno'], 'cargas de veneno y', me.cargas['maldita'], 'cargas malditas y estás', me.cargas['hielo'] + me.cargas['stun'] + me.cargas['paralizado'], 'turnos congelados/stuneados/paralizados tienes', me.carga_cambiaforma, 'cargas de cambiaformas', me.carga_pantera, 'cargas de pantera y', me.pantera, '(Si es 0 eres humano y si 1 eres pantera)' ,'\n')
 
 def infocascos():
@@ -99,7 +97,7 @@ def botas_venganza(ones):
         print ('Alimenta tus ganas de venganza y aumenta tu poder en 1.5', '\n')
     elif venganza == 6:
         ones.power += 2
-        print ('Alimemta tus ganas de venganza y aumenta tu poder en 2', '\n')
+        print ('Alimenta tus ganas de venganza y aumenta tu poder en 2', '\n')
     else:
         print ('Error, informa de este error')
 
@@ -1471,73 +1469,103 @@ def check_dies (team, total):
         if team:
             if uno.health <= 0 and dos.health <= 0 and tres.health <= 0 and cuatro.health <= 0:
                 print ('Es un EMPATE. ¿¿Cómo?? JAJAJAJA')
+                exit()
             elif uno.health <= 0 and dos.health <= 0:
                 print ('Players 3 & 4 WIIIIN')
+                exit()
             elif tres.health <= 0 and cuatro.health <= 0:
                 print ('Players 1 & 2 WIIIIN')
+                exit()
         else:
             if uno.health <= 0 and dos.health <= 0 and tres.health <= 0 and cuatro.health <= 0:
                 print ('Es un EMPATE. ¿¿Cómo?? JAJAJAJA')
+                exit()
             elif uno.health <= 0 and dos.health <= 0 and tres.health <= 0:
                 print ('Players 4 WIIIIN')
+                exit()
             elif tres.health <= 0 and cuatro.health <= 0 and uno.health <= 0:
                 print ('Players 2 WIIIIN')
+                exit()
             elif uno.health <= 0 and dos.health <= 0 and cuatro.health <= 0:
                 print ('Players 3 WIIIIN')
+                exit()
             elif tres.health <= 0 and cuatro.health <= 0 and dos.health <= 0:
                 print ('Players 1 WIIIIN')
+                exit()
 
     elif total == 6:
         if team == '2v2v2':
             if uno.health <= 0 and dos.health <= 0 and tres.health <= 0 and cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Es un EMPATE. ¿¿Cómo?? JAJAJAJA')
+                exit()
             elif uno.health <= 0 and dos.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Players 3 & 4 WIIIIN')
+                exit()
             elif tres.health <= 0 and cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Players 1 & 2 WIIIIN')
+                exit()
             elif uno.health <= 0 and dos.health <= 0 and tres.health <= 0 and cuatro.health:
                 print ('Players 5 & 6 WIIIIN')
+                exit()
         elif team == '3v3':
             if uno.health <= 0 and dos.health <= 0 and tres.health <= 0 and cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Es un EMPATE. ¿¿Cómo?? JAJAJAJA')
+                exit()
             elif uno.health <= 0 and dos.health <= 0 and tres.health <= 0:
                 print ('Players 4, 5 & 6 WIIIIN')
+                exit()
             elif cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Players 1, 2 & 3 WIIIIN')
+                exit()
         elif team:
             if uno.health <= 0 and dos.health <= 0 and tres.health <= 0 and cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Es un EMPATE. ¿¿Cómo?? JAJAJAJA')
+                exit()
             elif uno.health <= 0 and dos.health <= 0 and cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Players 3 WIIIIN')
+                exit()
             elif uno.health <= 0 and dos.health <= 0 and tres.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Players 4 WIIIIN')
+                exit()
             elif uno.health <= 0 and tres.health <= 0 and cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Players 2 WIIIIN')
+                exit()
             elif dos.health <= 0 and tres.health <= 0 and cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Players 1 WIIIIN')
+                exit()
             elif uno.health <= 0 and dos.health <= 0 and cuatro.health <= 0 and tres.health <= 0 and seis.health <= 0:
                 print ('Players 5 WIIIIN')
+                exit()
             elif uno.health <= 0 and dos.health <= 0 and tres.health <= 0 and cuatro.health and cinco.health <= 0:
                 print ('Players 6 WIIIIN')
+                exit()
     elif total == 10:
         if team == '2v2v2v2v2':
             if uno.health <= 0 and dos.health <= 0 and tres.health <= 0 and cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Es un EMPATE. ¿¿Cómo?? JAJAJAJA')
+                exit()
             elif uno.health <= 0 and dos.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Players 3 & 4 WIIIIN')
+                exit()
             elif tres.health <= 0 and cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Players 1 & 2 WIIIIN')
+                exit()
             elif uno.health <= 0 and dos.health <= 0 and tres.health <= 0 and cuatro.health:
                 print ('Players 5 & 6 WIIIIN')
+                exit()
         elif team == '5v5':
             if uno.health <= 0 and dos.health <= 0 and tres.health <= 0 and cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Es un EMPATE. ¿¿Cómo?? JAJAJAJA')
+                exit()
             elif uno.health <= 0 and dos.health <= 0 and tres.health <= 0:
                 print ('Players 4, 5 & 6 WIIIIN')
+                exit()
             elif cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Players 1, 2 & 3 WIIIIN')
+                exit()
         elif teams:
-            pass
+            print ('Work on progress, report this')
+            exit()
 
 def check_personaje (selff):
     if selff == her:
@@ -2369,7 +2397,7 @@ class Hero ():
             self.energy += 3
         printdatos(self, enemy)
 
-    def printinfo(self):
+    def printinfo(self, enemy):
         print ('La precisión del ataque uno es de: ', self.preci1, '%')
         print ('La precisión del ataque dos es de: ', self.preci1, '%')
         print ('La precisión del ataque tres es de: ', self.preci3, '%')
@@ -3755,7 +3783,7 @@ class Thief (Hero):
         print ('Defensa:', self.defense)
         print ('Velocidad:', self.velocity)
         print ('Ataque 1: "daga", golpea un nuemero aleatorio de veces del 0 al 5, 1º golpe hace 45 de daño, 2º golpe roba 5 de vida, 3º golpe aumenta tu poder en 0.1, 4º golpe infliges una carga venenosa, 5º golpe haces 80 de daño extra, cuesta 10 de energía y tiene', self.preci1,'% precisión')
-        print ('Ataque 2: "sangrado", inflije daño en función de la vida restante del enemigo 200/80 50%/100%, cuesta 16 de energía, tiene', self.preci2,'% precisión y 2 turnos de cooldown')
+        print ('Ataque 2: "sangrado", inflije daño en función de la vida restante del enemigo 300-<50% 50-<100%, cuesta 16 de energía, tiene', self.preci2,'% precisión y 2 turnos de cooldown')
         print ('Ataque super: "energia para mi", roba 50 de energia al rival (no afecta el poder), cuesta 30 de energía, tiene ', self.preci3,'% precisión y 2 turnos de cooldown (si tras el ataque tu enemigo se queda con energia negativa perderá 400 de vida)')
         print ('Vendas: "venda", cura 80 de vida, cura 1-2 hemorragias y 1-3 quemadura, cuesta 50 de energía y tiene', self.precicura,'% precisión')
         print ('Canalización: "energia", recupera 60 de energía y tiene', self.precienergia,'% precisión')
@@ -4147,7 +4175,7 @@ class Thief (Hero):
                                 print ('ERROR')
                         dacac (self, enemy)
                         printdatos(self, enemy)
-                    elif turn.lower() == 'fatiga':
+                    elif turn.lower() == 'sangrado':
                         #cargas
                         cargas(self)
                         #el turno
@@ -4183,9 +4211,9 @@ class Thief (Hero):
                         else:
                             if self.locura == 0:
                                 if enemy.health <= enemy.maxhealth / 2:
-                                    dano = 200 * self.power / enemy.defense
+                                    dano = 300 * self.power / enemy.defense
                                 else:
-                                    dano = 80 * self.power / enemy.defense
+                                    dano = 50 * self.power / enemy.defense
                                 if enemy.cargas['invencible'] == 1:
                                     dano = 0
                                 reflejo = dano * enemy.reflejar 
@@ -4207,18 +4235,18 @@ class Thief (Hero):
                                 locuraaa = randint (1, 100)
                                 if locuraaa < self.locura:
                                     if self.health <= self.maxhealth / 2:
-                                        dano = 200 * self.power / self.defense
+                                        dano = 300 * self.power / self.defense
                                     else:
-                                        dano = 80 * self.power / self.defense
+                                        dano = 50 * self.power / self.defense
                                     if self.cargas['invencible'] == 1:
                                         dano = 0
                                     self.health -= dano
                                     print ('Te vuelves loco y te clavas tu propia daga sobre una de tus heridas, infligiendote', dano, 'de daño')
                                 else:
                                     if enemy.health <= enemy.maxhealth / 2:
-                                        dano = 200 * self.power / enemy.defense
+                                        dano = 300 * self.power / enemy.defense
                                     else:
-                                        dano = 80 * self.power / enemy.defense
+                                        dano = 50 * self.power / enemy.defense
                                     if enemy.cargas['invencible'] == 1:
                                         dano = 0
                                     reflejo = dano * enemy.reflejar 
@@ -4273,11 +4301,11 @@ class Thief (Hero):
                             self.energy += 3
                         else:
                             print ('¡',self.name, 'saca algo de su mochila! Saca un libro de encantamientos... (', self.name,': ¡robado!) conjura un hechizo y le roba 60 de energia a', self.name)
-                            enemy.energy -= 60
-                            self.energy += 40
-                            self.energy -= 40
+                            enemy.energy -= 50
+                            self.energy += 50
+                            self.energy -= 30
                             if enemy.energy < 0:
-                                enemy.health -= 300
+                                enemy.health -= 400
                             self.energy += 3
                         self.cooldown[2] = campo.nturnos + 3
                         printdatos(self, enemy)
@@ -9403,7 +9431,7 @@ if cuantosplayers == '2':
     'warrior': guerrero, 'magician': mago, 'hereje': arquero, 'maldi': maldito, 'thief': robador, 'shapeshifter': pantera,
     'healer': curandera, 'mace': maza, 'fires': igneo, 'snake charner': serpientero, 'apostador': poker, 'natural': natural,
     'diablillo': diablillo, 'support': support, 'chiquitin': chiquitin, 'guadaña': guadana, 'crossbow': ballesta, 'loco': locoloco,
-    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero
+    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero, 'serenita' : her, 'serenità' : her
     }
 
     def translate(value):
@@ -9541,7 +9569,7 @@ if cuantosplayers.find('2') != -1 and cuantosplayers.find('comp') != -1:
     'warrior': guerrero, 'magician': mago, 'hereje': arquero, 'maldi': maldito, 'thief': robador, 'shapeshifter': pantera,
     'healer': curandera, 'mace': maza, 'fires': igneo, 'snake charner': serpientero, 'apostador': poker, 'natural': natural,
     'diablillo': diablillo, 'support': support, 'chiquitin': chiquitin, 'guadaña': guadana, 'crossbow': ballesta, 'loco': locoloco,
-    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero
+    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero, 'serenita' : her, 'serenità' : her
     }
 
     def translate(value):
@@ -9692,7 +9720,7 @@ elif cuantosplayers == '3':
     'warrior': guerrero, 'magician': mago, 'hereje': arquero, 'maldi': maldito, 'thief': robador, 'shapeshifter': pantera,
     'healer': curandera, 'mace': maza, 'fires': igneo, 'snake charner': serpientero, 'apostador': poker, 'natural': natural,
     'diablillo': diablillo, 'support': support, 'chiquitin': chiquitin, 'guadaña': guadana, 'crossbow': ballesta, 'loco': locoloco,
-    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero
+    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero, 'serenita' : her, 'serenità' : her
     }
 
     def translate(value):
@@ -9865,7 +9893,7 @@ elif cuantosplayers.find('3') != -1 and cuantosplayers.find ('comp') != -1:
     'warrior': guerrero, 'magician': mago, 'hereje': arquero, 'maldi': maldito, 'thief': robador, 'shapeshifter': pantera,
     'healer': curandera, 'mace': maza, 'fires': igneo, 'snake charner': serpientero, 'apostador': poker, 'natural': natural,
     'diablillo': diablillo, 'support': support, 'chiquitin': chiquitin, 'guadaña': guadana, 'crossbow': ballesta, 'loco': locoloco,
-    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero
+    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero, 'serenita' : her, 'serenità' : her
     }
 
     def translate(value):
@@ -10064,7 +10092,7 @@ elif cuantosplayers == '4':
     'warrior': guerrero, 'magician': mago, 'hereje': arquero, 'maldi': maldito, 'thief': robador, 'shapeshifter': pantera,
     'healer': curandera, 'mace': maza, 'fires': igneo, 'snake charner': serpientero, 'apostador': poker, 'natural': natural,
     'diablillo': diablillo, 'support': support, 'chiquitin': chiquitin, 'guadaña': guadana, 'crossbow': ballesta, 'loco': locoloco,
-    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero
+    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero, 'serenita' : her, 'serenità' : her
     }
 
     def translate(value):
@@ -10258,7 +10286,7 @@ elif cuantosplayers.find('4') != -1 and cuantosplayers.find ('comp') != -1:
     'warrior': guerrero, 'magician': mago, 'hereje': arquero, 'maldi': maldito, 'thief': robador, 'shapeshifter': pantera,
     'healer': curandera, 'mace': maza, 'fires': igneo, 'snake charner': serpientero, 'apostador': poker, 'natural': natural,
     'diablillo': diablillo, 'support': support, 'chiquitin': chiquitin, 'guadaña': guadana, 'crossbow': ballesta, 'loco': locoloco,
-    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero
+    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero, 'serenita' : her, 'serenità' : her
     }
 
     def translate(value):
@@ -10488,7 +10516,7 @@ elif cuantosplayers.lower() == '6':
     'warrior': guerrero, 'magician': mago, 'hereje': arquero, 'maldi': maldito, 'thief': robador, 'shapeshifter': pantera,
     'healer': curandera, 'mace': maza, 'fires': igneo, 'snake charner': serpientero, 'apostador': poker, 'natural': natural,
     'diablillo': diablillo, 'support': support, 'chiquitin': chiquitin, 'guadaña': guadana, 'crossbow': ballesta, 'loco': locoloco,
-    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero
+    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero, 'serenita' : her, 'serenità' : her
     }
 
     def translate(value):
@@ -10728,7 +10756,7 @@ elif cuantosplayers.find('6') != -1 and cuantosplayers.find ('comp') != -1:
     'warrior': guerrero, 'magician': mago, 'hereje': arquero, 'maldi': maldito, 'thief': robador, 'shapeshifter': pantera,
     'healer': curandera, 'mace': maza, 'fires': igneo, 'snake charner': serpientero, 'apostador': poker, 'natural': natural,
     'diablillo': diablillo, 'support': support, 'chiquitin': chiquitin, 'guadaña': guadana, 'crossbow': ballesta, 'loco': locoloco,
-    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero
+    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero, 'serenita' : her, 'serenità' : her
     }
 
     def translate(value):
@@ -11029,7 +11057,7 @@ elif cuantosplayers.lower() == '10':
     'warrior': guerrero, 'magician': mago, 'hereje': arquero, 'maldi': maldito, 'thief': robador, 'shapeshifter': pantera,
     'healer': curandera, 'mace': maza, 'fires': igneo, 'snake charner': serpientero, 'apostador': poker, 'natural': natural,
     'diablillo': diablillo, 'support': support, 'chiquitin': chiquitin, 'guadaña': guadana, 'crossbow': ballesta, 'loco': locoloco,
-    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero
+    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero, 'serenita' : her, 'serenità' : her
     }
 
     def translate(value):
@@ -11525,7 +11553,7 @@ elif cuantosplayers.find('atraco') != -1 and cuantosplayers.find('comp') != -1:
     'warrior': guerrero, 'magician': mago, 'hereje': arquero, 'maldi': maldito, 'thief': robador, 'shapeshifter': pantera,
     'healer': curandera, 'mace': maza, 'fires': igneo, 'snake charner': serpientero, 'apostador': poker, 'natural': natural,
     'diablillo': diablillo, 'support': support, 'chiquitin': chiquitin, 'guadaña': guadana, 'crossbow': ballesta, 'loco': locoloco,
-    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank
+    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 
     }
 
     def translate(value):
@@ -11706,7 +11734,7 @@ elif cuantosplayers.lower() == '1':
     'warrior': guerrero, 'magician': mago, 'hereje': arquero, 'maldi': maldito, 'thief': robador, 'shapeshifter': pantera,
     'healer': curandera, 'mace': maza, 'fires': igneo, 'snake charner': serpientero, 'apostador': poker, 'natural': natural,
     'diablillo': diablillo, 'support': support, 'chiquitin': chiquitin, 'guadaña': guadana, 'crossbow': ballesta, 'loco': locoloco,
-    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank
+    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'serenita' : her, 'serenità' : her
     }
 
     def translate(value):
