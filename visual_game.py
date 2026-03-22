@@ -1,6 +1,7 @@
 import pygame
 import sys
 from scroll_personajes import mostrar_personajes_scroll
+from combate import GestorCombate
 
 
 pygame.init()
@@ -54,6 +55,7 @@ descripcion_personajes = {
     "Santa Claus": "Creo que este no es el verdadero... NO JUGARLO ESTANDO SOLO, no hace daño.",
     "Werewolf": "Hombre lobo con gran sustain y gran daño, si no te haces un 1v3 con este personajes eres manco xD.",
     "Runeforge": "Sacado de la herrería del sol es capaz de forjar cosas de gran valor para la batalla.",
+    "Serenità": "Maga mistica che protegge i suoi alleati con una calma quasi irreale... qualcuno giura che venga da Parma. NON GIOCARLA DA SOLA: non infligge danni diretti.",
 }
 
 info_visible = {
@@ -96,7 +98,7 @@ personajes = [
     "Warrior", "Warrior Tank", "Magician", "Hereje", "Maldi", "Thief", "Shapeshifter",
     "Mace", "Healer", "Fires", "Snake Charmer", "Apostador", "Natural", "Natural Heal", "Diablillo",
     "Chiquitin", "Guadaña", "Crossbow", "Support", "Loco", "Root", "Santa Claus",
-    "Werewolf", "Runeforge"
+    "Werewolf", "Runeforge", "Serenità"
 ]
 cascos = [
     "Hábito de monje", "Capucha de niebla", "Casco de truenos",
@@ -285,32 +287,29 @@ def dibujar_info():
             screen.blit(linea_render, (x + padding, y_linea))
             y_linea += fuente.get_height() + 5
 
-button_combate = Button("Empezar combate", WIDTH//2 - 100, HEIGHT - 120, 200, 50,
+button_combate = Button("Empezar combate", WIDTH//2 - 100, HEIGHT - 65, 200, 50,
                         lambda: iniciar_combate_visual())
 
 def iniciar_combate_visual():
-    # Si no hay selecciones no hacemos nada
     if not game_state['selecciones']:
         return
-
-    # Transforma el resumen de selecciones en una lista para la pantalla de combate
     game_state['jugadores'] = []
     for jug, datos in game_state['selecciones'].items():
         game_state['jugadores'].append({
             'jugador': jug,
             'personaje': datos.get('personaje', ''),
-            'casco': datos.get('casco', ''),
-            'armadura': datos.get('armadura', ''),
+            'casco': datos.get('cascos', ''),
+            'armadura': datos.get('armaduras', ''),
             'botas': datos.get('botas', ''),
         })
-
+    game_state['gestor_combate'] = GestorCombate(screen, game_state['jugadores'], fondo=combat_forest)
     game_state['screen'] = 'combate'
 
 def dibujar_resumen():
     titulo=fuente.render("RESUMEN DE SELECCIONES",True,BLUE)
     screen.blit(titulo,(WIDTH//2-titulo.get_width()//2,30))
     for i,(jug,datos) in enumerate(game_state['selecciones'].items()):
-        texto=f"{jug}: {datos.get('personaje','')} | {datos.get('casco','')} | {datos.get('armadura','')} | {datos.get('botas','')}"
+        texto=f"{jug}: {datos.get('personaje','')} | {datos.get('cascos','')} | {datos.get('armaduras','')} | {datos.get('botas','')}"
         render=fuente.render(texto,True,WHITE)
         screen.blit(render,(50,80+i*30))
     button_volver.draw(screen)
@@ -319,7 +318,8 @@ def dibujar_resumen():
 # Bucle principal
 running = True
 while running:
-    screen.blit(background,(0, 0))
+    if game_state['screen'] != 'combate':
+        screen.blit(background,(0, 0))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -383,7 +383,8 @@ while running:
             mostrar_personajes_scroll(
                 screen, fuente, personajes,
                 seleccion_callback=callback,
-                jugador_actual=game_state['jugador_actual']
+                jugador_actual=game_state['jugador_actual'],
+                fondo=background
             )
 
 
@@ -403,13 +404,14 @@ while running:
                 bloqueo_callback=callback,
                 bloqueados=game_state['bloqueos'],
                 jugador_actual=game_state['jugador_actual'],
-                es_bloqueo=True
+                es_bloqueo=True,
+                fondo=background
             )
 
         elif game_state['screen'] in ['seleccion_build', 'build_competitivo']:
             if game_state['jugador_actual'] == -1:
                 continue
-            for tipo, items, y_base in [("casco", cascos, 100), ("armadura", armaduras, 180), ("botas", botas, 260)]:
+            for tipo, items, y_base in [("cascos", cascos, 100), ("armaduras", armaduras, 180), ("botas", botas, 260)]:
                 for i, nombre in enumerate(items):
                     rect = pygame.Rect(50 + i * 220, y_base, 200, 45)
                     if rect.collidepoint(pygame.mouse.get_pos()) and event.type == pygame.MOUSEBUTTONDOWN:
@@ -421,9 +423,13 @@ while running:
                     if info_btn.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]:
                         mostrar_info(nombre)
         elif game_state['screen'] == 'resumen':
-            dibujar_resumen()  
             button_volver.handle_event(event)
-            game_state["button_combate"].handle_event(event)
+            button_combate.handle_event(event)
+
+        elif game_state['screen'] == 'combate':
+            gestor = game_state.get('gestor_combate')
+            if gestor:
+                gestor.handle_event(event)
 
         if game_state['screen'] in ['seleccion_build', 'build_competitivo'] and game_state['build_seleccionada']:
             confirmar_button.handle_event(event)
@@ -569,18 +575,13 @@ while running:
             elif no_rect.collidepoint(event.pos):
                 game_state['screen'] = 'seleccion_personaje'
 
-    elif game_state['screen'] == 'combate':
-        screen.blit(combat_forest, (0, 0))
-        titulo = fuente.render("COMBATE", True, BLACK)
-        screen.blit(titulo, (WIDTH//2 - titulo.get_width()//2, 30))
+    if game_state['screen'] == 'resumen':
+        dibujar_resumen()
 
-        for i, pj in enumerate(game_state.get("jugadores", [])):
-            if isinstance(pj, dict):
-                texto = f"{pj.get('nombre','')} | {pj.get('casco','')} | {pj.get('armadura','')} | {pj.get('botas','')}"
-            else:
-                texto = str(pj)  
-            render = fuente.render(texto, True, WHITE)
-            screen.blit(render, (50, 100 + i*40))
+    if game_state['screen'] == 'combate':
+        gestor = game_state.get('gestor_combate')
+        if gestor:
+            gestor.draw()
 
     dibujar_info()
     pygame.display.flip()
