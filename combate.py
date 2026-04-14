@@ -131,7 +131,7 @@ def render_emoji_line(surf, font, text: str, color, x: int, y: int, esize: int =
 
 # ──────────────────────────────────────────────────────────────────
 #  Utilidades de dibujo
-# ──────────────────────────────────────────────────────────────────
+# ────────────────────────────────────────────────────────────────── Luchador
 def draw_rect_alpha(surf, color, rect, alpha=180, radius=6):
     s = pygame.Surface((rect[2], rect[3]), pygame.SRCALPHA)
     pygame.draw.rect(s, (*color, alpha), (0, 0, rect[2], rect[3]), border_radius=radius)
@@ -158,8 +158,8 @@ def bar_color(pct):
 # ──────────────────────────────────────────────────────────────────
 STATS_BASE = {
     # nombre          hp    en   pwr   def   vel
-    'Warrior':       (2500, 120, 0.95, 1.20,  42),
-    'Warrior Tank':  (2800, 100, 0.85, 1.50,  30),
+    'Warrior':       (1740, 130, 1.20, 0.975,  42),
+    'Warrior Tank':  (2500, 120, 0.95, 1.50,  42),
     'Magician':      (1580, 170, 1.00, 1.00,  30),
     'Hereje':        (1700, 145, 1.00, 1.00,  59),
     'Maldi':         (1530, 180, 1.00, 1.00,  16),
@@ -173,7 +173,7 @@ STATS_BASE = {
     'Natural':       (1600, 220, 1.00, 1.00,  37),
     'Natural Heal':  (1600, 220, 1.00, 1.00,  37),
     'Diablillo':     (2000, 145, 1.00, 1.00,  75),
-    'Chiquitin':     ( 400,  80, 1.00, 1.00,  80),
+    'Chiquitin':     ( 400,  10, 1.00, 1.00,  32),
     'Guadaña':       (1930, 310, 1.00, 1.00,  40),
     'Crossbow':      (1760, 178, 1.00, 1.00,  37),
     'Support':       (1780, 180, 1.00, 1.00,  36),
@@ -233,11 +233,8 @@ HABILIDADES = {
       '30·pwr dmg. 70% añade 1 sangrado. Coste 2 EN.'),
     H('Estocada',  45, 1, 0, 90, 'ataque', ORANGE,
       '101·pwr dmg. Coste 45 EN.'),
-    H('Caballero', 60, 2, 3, 85, 'buff',   YELLOW,
-      '[mutado=0] Escudo 160·pwr HP + +0.2 def al aliado. '
-      'EFT: escudo expira en 3t devolviendo HP base. CD 3t.'),
     H('Furia',     60, 2, 4, 85, 'buff',   ORANGE,
-      '[mutado=1] +4 pwr propio por 2t. EFT: -4 pwr al expirar. CD 4t.'),
+      '+4 pwr propio por 2t. EFT: -4 pwr al expirar. CD 4t.'),
     VENDA, ENERGIA,
 ],
 
@@ -248,8 +245,10 @@ HABILIDADES = {
       '30·pwr dmg. 70% añade 1 sangrado.'),
     H('Estocada', 45, 1, 0, 90, 'ataque', ORANGE,
       '101·pwr dmg.'),
-    H('Furia',    60, 2, 4, 85, 'buff',   YELLOW,
-      '+4 pwr propio por 2t. EFT: -4 pwr al expirar. CD 4t.'),
+    H('Caballero', 60, 2, 3, 85, 'buff',   YELLOW,
+      'Escudo 160·pwr HP + +0.2 def al aliado. '
+      'EFT: escudo expira en 3t devolviendo HP base. CD 3t.'),
+
     VENDA, ENERGIA,
 ],
 
@@ -347,7 +346,7 @@ HABILIDADES = {
     CURA_H, ENERGIAR,
 ],
 
-# ── Mace ───────────────────────────────────────────────────────── 
+# ── Mace ─────────────────────────────────────────────────────────
 # Pasiva Concentración: Canalizar (Energía) da el doble de energía (120 EN)
 # Salto Profundo: stun = 2 turnos sin poder atacar
 'Mace': [
@@ -804,13 +803,13 @@ ESCENARIOS = {
     3:  ('Pradera',          'fondo_pradera.png',
          'Bella pradera — sin efectos especiales.',
          None, 0),
-    4:  ('Caos',             'fondo_caos.png',
+    4:  ('Caos',             'fondo_locura.png',
          'El caos consume a todos: +20 locura inicial.',
          'locura', 20),
     5:  ('Bosque',           'fondo_bosque.png',
          'Bosque: personajes agiles +0.25 def.',
          'def_agil', 0.25),
-    6:  ('Dimension Psiquica','fondo_psiquico.png',
+    6:  ('Dimension Psiquica','fondo_pradera.png',
          'Dimension psiquica: magos +0.25 pwr.',
          'pwr_mago', 0.25),
     7:  ('Ciudad',           'fondo_ciudad.png',
@@ -822,10 +821,10 @@ ESCENARIOS = {
     9:  ('Noche',            'fondo_noche.png',
          'Noche: todos -20% precision.',
          'preci_menos', 20),
-    10: ('Patas Arriba',     'fondo_patosarriba.png',
+    10: ('Patas Arriba',     'fondo_pradera.png',
          'Patas arriba: el mas lento ataca primero.',
          'vel_invertida', 0),
-    11: ('Fuente de Energia','fondo_energia.png',
+    11: ('Fuente de Energia','fondo_maná.png',
          'Fuente infinita: todos +100000 energia.',
          'energia_inf', 100000),
 }
@@ -877,7 +876,7 @@ def aplicar_escenario(escenario_id: int, luchadores: list, log) -> str:
             log.add(f'Escenario {nombre}: {lf.jugador} +energia')
     return desc
 
-# ──────────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────────  barra
 #  LUCHADOR
 # ──────────────────────────────────────────────────────────────────
 class Luchador:
@@ -890,7 +889,7 @@ class Luchador:
         hp, en, pwr, defn, vel = STATS_BASE.get(personaje, (1000,100,1.0,1.0,50))
         self.maxhp  = hp
         self.hp     = hp
-        self.maxen  = en
+        self.maxen  = 99999
         self.en     = en
         self.pwr    = pwr
         self.defn   = defn
@@ -1022,23 +1021,86 @@ class Luchador:
         return msgs
 
     def decrementar_efectos_temporales(self, nturnos, log):
-        """Decrementa stun/hielo/paralizado/silenciado/inmovilizado por turno"""
+        """
+        Procesa efectos por tiempo:
+        1) Cargas que decaen 1/turno: stun, hielo, silenciado, inmovilizado, paralizado
+        2) EFT del motor (_efectos_temp dicts): se revierten al expirar
+        """
+        # ── Cargas que decaen por turno ──────────────────────────
         for k in ['stun','hielo','paralizado','silenciado','inmovilizado']:
-            if self.cargas[k] > 0:
+            if self.cargas.get(k, 0) > 0:
                 self.cargas[k] -= 1
 
-        # Efectos temporales de stats
-        nuevos = []
-        for (efecto, turnos, val) in self.efectos_temp:
-            if turnos <= 1:
-                # revertir
-                if efecto == 'apower':   self.pwr  -= val
-                elif efecto == 'bpower': self.pwr  += val
-                elif efecto == 'adef':   self.defn -= val
-                elif efecto == 'bdef':   self.defn += val
+        # ── Efectos por tiempo (nuevo sistema, dicts con 'expira') ─
+        if not hasattr(self, '_efectos_temp'):
+            self._efectos_temp = []
+
+        pendientes = []
+        for eft in self._efectos_temp:
+            if nturnos >= eft['expira']:
+                # ── expirado → aplicar reversión / efecto final ──
+                nombre = eft['nombre']
+                valor  = eft['valor']
+
+                if nombre == 'bdefensa_rev':
+                    # valor negativo = se había reducido def → ahora se recupera
+                    # valor positivo = se había subido def → ahora se revierte
+                    self.defn = max(0.1, self.defn - valor)
+                    if log: log.add(f'EFT expire: {self.jugador} def {"-" if valor>0 else "+"}{abs(valor):.2f} (fin efecto)')
+
+                elif nombre == 'apower_rev':
+                    self.pwr  = max(0.1, self.pwr - valor)
+                    if log: log.add(f'EFT expire: {self.jugador} -{valor} pwr (fin efecto)')
+
+                elif nombre == 'bendicion_rev':
+                    # valor = (def, rcura)
+                    d, r = valor
+                    self.defn  = max(0.1, self.defn  - d)
+                    self.rcura = max(0.1, self.rcura - r)
+                    if log: log.add(f'EFT expire: {self.jugador} bendicion termina (-{d} def, -{r} rcura)')
+
+                elif nombre == 'diablo_exp':
+                    # Daño del diablo segun cargas malditas
+                    malditas = self.cargas.get('maldita', 0)
+                    tabla = {0:100, 1:150, 2:250, 3:500}
+                    base  = tabla.get(malditas, 800)
+                    dano  = base * valor / self.defn
+                    if self.cargas.get('invencible', 0) > 0: dano = 0
+                    self.recibir_dano(dano)
+                    self.cargas['maldita'] = 0
+                    self.cargas['cura']    = 0
+                    if log: log.add(f'EFT Diablo: {self.jugador} -{int(dano)} HP '
+                                    f'({malditas} malditas -> base {base})')
+
+                elif nombre == 'bomba_crossbow':
+                    # Bomba retardada de Crossbow
+                    dano = valor
+                    if self.cargas.get('invencible', 0) > 0: dano = 0
+                    self.recibir_dano(dano)
+                    if log: log.add(f'EFT Bomba Crossbow: {self.jugador} -{int(dano)} HP')
+
+                elif nombre == 'conexion_root':
+                    pass  # la conexión se aplica al recibir daño; aquí solo expira
+
             else:
-                nuevos.append((efecto, turnos-1, val))
-        self.efectos_temp = nuevos
+                pendientes.append(eft)
+
+        self._efectos_temp = pendientes
+
+        # ── Sistema antiguo (efectos_temp lista de tuplas) ─────────
+        if hasattr(self, 'efectos_temp') and isinstance(self.efectos_temp, list):
+            nuevos = []
+            for item in self.efectos_temp:
+                if isinstance(item, tuple) and len(item) == 3:
+                    efecto, turnos, val = item
+                    if turnos <= 1:
+                        if efecto == 'apower':   self.pwr  -= val
+                        elif efecto == 'bpower': self.pwr  += val
+                        elif efecto == 'adef':   self.defn -= val
+                        elif efecto == 'bdef':   self.defn += val
+                    else:
+                        nuevos.append((efecto, turnos-1, val))
+            self.efectos_temp = nuevos
 
     def puede_actuar(self):
         """Devuelve (puede, razon)"""
@@ -1106,578 +1168,906 @@ class Luchador:
 #  EJECUTAR HABILIDAD
 # ──────────────────────────────────────────────────────────────────
 def ejecutar_habilidad(hab_nombre, atacante, objetivo, todos, nturnos, log):
-    """Ejecuta la habilidad y devuelve lista de mensajes."""
+    """
+    Ejecuta la habilidad con valores y mecánicas exactos del motor Text_Legends.py.
+    Devuelve lista de mensajes para el log.
+    """
     msgs = []
     atk = atacante
     tgt = objetivo
     p   = atk.personaje
 
-    def dmg_base(base):
-        d = base * atk.pwr / tgt.defn
-        if tgt.cargas['invencible'] > 0: d = 0
-        reflejo = d * atk.reflejar
-        d -= reflejo
-        d = max(0, d)
-        tgt.recibir_dano(d)
-        atk.hp -= reflejo
-        if atk.robovida > 0:
-            rob = d * min(1, atk.robovida)
-            atk.hp = min(atk.maxhp, atk.hp + rob)
-            if rob > 0: msgs.append(f'🩸 {atk.jugador} roba {int(rob)} HP')
-        return d
+    # ── helpers ──────────────────────────────────────────────────
+    def dmg(base, src=None, dst=None):
+        """Daño escalado por pwr/def con reflejo y robovida."""
+        a = src or atk; d = dst or tgt
+        raw = base * a.pwr / d.defn
+        if d.cargas['invencible'] > 0: raw = 0
+        ref = raw * a.reflejar
+        raw -= ref; raw = max(0, raw)
+        d.recibir_dano(raw)
+        a.hp -= ref
+        if a.robovida > 0:
+            rob = raw * min(1.0, a.robovida)
+            a.hp = min(a.maxhp, a.hp + rob)
+            if rob > 1: msgs.append(f'{a.jugador} roba {int(rob)} HP')
+        return raw
 
-    def check_preci(pct):
-        return randint(0,100) <= pct
+    def dmg_fijo(base, dst=None):
+        """Daño fijo (sin escalar con pwr), sí respeta invencible y reflejo."""
+        d = dst or tgt
+        if d.cargas['invencible'] > 0: return 0
+        d.recibir_dano(base)
+        return base
 
-    # ─── Soporte ──────────────────────────────
+    def hit(pct): return randint(0, 100) <= pct
+
+    def eft_push(quien, nombre, valor, dur):
+        """Añade un efecto temporal al estilo motor (se revierte al expirar)."""
+        q = quien
+        if not hasattr(q, '_efectos_temp'): q._efectos_temp = []
+        q._efectos_temp.append({'nombre': nombre, 'valor': valor,
+                                 'expira': nturnos + dur})
+
+    def cura(quien, cantidad):
+        quien.hp = min(quien.maxhp, quien.hp + max(0, cantidad * quien.rcura))
+
+    # ── soporte universal ─────────────────────────────────────────
     if hab_nombre == 'Venda':
-        atk.curar(80)
-        atk.cargas['quemado'] = max(0, atk.cargas['quemado'] - randint(1,3))
+        cura(atk, 80)
+        atk.cargas['quemado']    = max(0, atk.cargas['quemado']    - randint(1,3))
         atk.cargas['hemorragia'] = max(0, atk.cargas['hemorragia'] - randint(1,2))
-        msgs.append(f'💊 {atk.jugador} usa Venda: +80 HP, quita quemaduras/hemorragias')
+        msgs.append(f'{atk.jugador} usa Venda: +80 HP, quita quemaduras/hemorragias')
+        atk.en = min(atk.maxen, atk.en + 4)
         return msgs
 
     if hab_nombre == 'Curar':
-        cantidad = 100 * atk.pwr
-        tgt.curar(cantidad)
-        for k in ['veneno','sangrado','quemado','maldita']:
-            tgt.cargas[k] = 0
-        msgs.append(f'💚 {atk.jugador} cura a {tgt.jugador}: +{int(cantidad)} HP, purificado')
+        c = 100 * atk.pwr * atk.rcura
+        cura(tgt, c)
+        for k in ['veneno','sangrado','quemado','maldita']: tgt.cargas[k] = 0
+        msgs.append(f'{atk.jugador} cura a {tgt.jugador}: +{int(c)} HP + purificado')
+        atk.en = min(atk.maxen, atk.en + 4)
         return msgs
 
     if hab_nombre == 'Energía':
-        atk.en = min(atk.maxen, atk.en + 60)
-        msgs.append(f'⚡ {atk.jugador} canaliza: +60 energía')
+        # Pasiva Concentración (Mace/Guadana): doble energía
+        bonus = 120 if p in ('Mace','Guadana') else 60
+        atk.en = min(atk.maxen, atk.en + bonus)
+        msgs.append(f'{atk.jugador} canaliza: +{bonus} EN')
         return msgs
 
     if hab_nombre == 'Energiar':
         tgt.en = min(tgt.maxen, tgt.en + 60)
-        msgs.append(f'⚡ {atk.jugador} da energía a {tgt.jugador}: +60 EN')
+        msgs.append(f'{atk.jugador} da energía a {tgt.jugador}: +60 EN')
+        atk.en = min(atk.maxen, atk.en + 4)
         return msgs
 
     if hab_nombre == 'Pasto':
         for lf in todos:
             if lf.vivo:
-                lf.curar(lf.maxhp * 0.005)
-        msgs.append(f'🌿 {atk.jugador} usa Pasto: +0.5% HP a todos')
+                lf.hp = min(lf.maxhp, lf.hp + lf.maxhp * 0.005)
+        msgs.append(f'{atk.jugador} usa Pasto: +0.5% HP a todos')
+        atk.en = min(atk.maxen, atk.en + 4)
         return msgs
 
     if hab_nombre == 'Saltar':
         atk.en = min(atk.maxen, atk.en + 4)
-        msgs.append(f'⏭ {atk.jugador} salta el turno (+4 EN)')
+        msgs.append(f'{atk.jugador} salta (+4 EN)')
         return msgs
 
-    # ─── Warrior ──────────────────────────────
+    # ── Warrior / Warrior Tank ────────────────────────────────────
     if p in ('Warrior', 'Warrior Tank'):
         if hab_nombre == 'Tajo':
-            if not check_preci(95):
-                msgs.append(f'💨 {atk.jugador} falla Tajo!')
+            if not hit(95): msgs.append(f'{atk.jugador} falla Tajo!')
             else:
-                d = dmg_base(30)
-                msgs.append(f'⚔ Tajo: {atk.jugador} → {tgt.jugador} -{int(d)} HP')
-                if randint(0,100) <= 70:
+                d = dmg(30)
+                msgs.append(f'Tajo: {atk.jugador} -> {tgt.jugador} -{int(d)} HP')
+                if hit(70):
                     tgt.cargas['sangrado'] += 1
-                    msgs.append(f'🩸 Sangrado aplicado a {tgt.jugador}')
+                    msgs.append(f'Sangrado aplicado a {tgt.jugador}')
             atk.en -= 2
+
         elif hab_nombre == 'Estocada':
-            if not check_preci(90):
-                msgs.append(f'💨 {atk.jugador} falla Estocada!')
-                atk.en -= 17
+            if not hit(90):
+                msgs.append(f'{atk.jugador} falla Estocada!')
             else:
-                d = dmg_base(101)
-                msgs.append(f'⚔ Estocada: {atk.jugador} → {tgt.jugador} -{int(d)} HP')
-                atk.en -= 45
+                d = dmg(101)
+                msgs.append(f'Estocada: {atk.jugador} -> {tgt.jugador} -{int(d)} HP')
+            atk.en -= 45
+
         elif hab_nombre == 'Caballero':
-            if atk.mutado == 0:
-                tgt.hp = min(tgt.maxhp, tgt.hp + 120)
+            # [mutado=0] escudo 160·pwr HP + +0.2 def al aliado — EFT 3t
+            if not hit(85): msgs.append(f'{atk.jugador} falla Caballero!')
+            else:
+                shield = int(160 * atk.pwr)
+                tgt.hp = min(tgt.maxhp, tgt.hp + shield)
                 tgt.defn += 0.2
-                msgs.append(f'🛡 Caballero: escudo +120HP, +0.2 def a {tgt.jugador}')
-                atk.en -= 60
+                eft_push(tgt, 'bdefensa_rev', 0.2, 3)   # -0.2 def al expirar
+                msgs.append(f'Caballero: escudo +{shield} HP, +0.2 def a {tgt.jugador} (3t)')
+            atk.en -= 60
+            atk.cooldowns[2] = nturnos + 3
+
+        elif hab_nombre == 'Furia':
+            # +4 pwr propio 2t — EFT revierte
+            if not hit(85): msgs.append(f'{atk.jugador} falla Furia!')
             else:
                 atk.pwr += 4
-                msgs.append(f'💢 Furia: {atk.jugador} +4 pwr 1t')
-                atk.en -= 60
-        elif hab_nombre == 'Furia':
-            atk.pwr += 4
-            msgs.append(f'💢 Furia: {atk.jugador} +4 pwr 1t')
+                eft_push(atk, 'apower_rev', 4, 2)
+                msgs.append(f'Furia: {atk.jugador} +4 pwr por 2t')
             atk.en -= 60
+            atk.cooldowns[2] = nturnos + 4
 
-    # ─── Magician ──────────────────────────────
+    # ── Magician ──────────────────────────────────────────────────
     elif p == 'Magician':
         if hab_nombre == 'Orbe':
-            if not check_preci(90): msgs.append(f'💨 {atk.jugador} falla Orbe!')
+            if not hit(90): msgs.append(f'{atk.jugador} falla Orbe!')
             else:
-                d = dmg_base(25)
+                d = dmg(72)
                 tgt.cargas['hielo'] = max(tgt.cargas['hielo'], 1)
-                msgs.append(f'🔵 Orbe: -{int(d)} HP + congela 1t {tgt.jugador}')
-            atk.en -= 20
+                msgs.append(f'Orbe: -{int(d)} HP + congela {tgt.jugador}')
+                # Pasiva Frenes: 40% lanza 2º orbe gratis
+                if hit(40):
+                    d2 = dmg(72)
+                    msgs.append(f'Frenes! 2º Orbe: -{int(d2)} HP a {tgt.jugador}')
+            atk.en -= 4
+
         elif hab_nombre == 'Fuerza':
             atk.pwr += 0.2
-            msgs.append(f'💪 {atk.jugador} +0.2 pwr permanente')
-            atk.en -= 30
-        elif hab_nombre == 'Tornado Fuego':
-            tgt.cargas['quemado'] += 2
-            msgs.append(f'🌪🔥 {atk.jugador} aplica 2 quemaduras a {tgt.jugador}')
+            msgs.append(f'{atk.jugador} +0.2 pwr permanente (Fuerza)')
             atk.en -= 60
 
-    # ─── Hereje ──────────────────────────────
+        elif hab_nombre == 'Tornado Fuego':
+            if not hit(85): msgs.append(f'{atk.jugador} falla Tornado de Fuego!')
+            else:
+                tgt.cargas['quemado'] += 2
+                msgs.append(f'Tornado de Fuego: {tgt.jugador} +2 quemaduras')
+                # Frenes: 40% repite
+                if hit(40):
+                    tgt.cargas['quemado'] += 2
+                    msgs.append(f'Frenes! 2º Tornado: {tgt.jugador} +2 quemaduras mas')
+            atk.en -= 150
+            atk.cooldowns[2] = nturnos + 7
+
+    # ── Hereje ────────────────────────────────────────────────────
     elif p == 'Hereje':
         if hab_nombre == 'Flecha':
-            if not check_preci(95): msgs.append(f'💨 {atk.jugador} falla Flecha!')
+            if not hit(95): msgs.append(f'{atk.jugador} falla Flecha!')
             else:
-                d = dmg_base(40)
-                msgs.append(f'🏹 Flecha: -{int(d)} HP a {tgt.jugador}')
-            atk.en -= 20
+                d = dmg(40)
+                tgt.cargas['hemorragia'] += 1
+                msgs.append(f'Flecha: -{int(d)} HP + hemorragia a {tgt.jugador}')
+                # Frenes: 40% 2ª flecha gratis
+                if hit(40):
+                    d2 = dmg(40)
+                    tgt.cargas['hemorragia'] += 1
+                    msgs.append(f'Frenes! 2ª Flecha: -{int(d2)} HP + hemorragia')
+            atk.en -= 3
+
         elif hab_nombre == 'Flecha Vampiro':
-            if not check_preci(90): msgs.append(f'💨 {atk.jugador} falla Flecha Vampiro!')
+            if not hit(90): msgs.append(f'{atk.jugador} falla Flecha Vampiro!')
             else:
-                d = dmg_base(50)
+                d = dmg(110)
                 rob = d * 0.10
                 atk.hp = min(atk.maxhp, atk.hp + rob)
-                msgs.append(f'🏹🩸 Flecha Vampiro: -{int(d)} HP, +{int(rob)} HP robado')
-            atk.en -= 35
-        elif hab_nombre == 'Ira':
-            atk.pwr += 1.0
-            msgs.append(f'💢 {atk.jugador} +1 pwr permanente (Ira)')
+                msgs.append(f'Flecha Vampiro: -{int(d)} HP, +{int(rob)} HP robado')
             atk.en -= 40
+            atk.cooldowns[1] = nturnos + 2
 
-    # ─── Maldi ──────────────────────────────
+        elif hab_nombre == 'Ira':
+            if not hit(85): msgs.append(f'{atk.jugador} falla Ira!')
+            else:
+                atk.pwr += 1.0
+                msgs.append(f'Ira: {atk.jugador} +1 pwr permanente')
+            atk.en -= 70
+            atk.cooldowns[2] = nturnos + 2
+
+    # ── Maldi ─────────────────────────────────────────────────────
     elif p == 'Maldi':
         if hab_nombre == 'Mal':
-            if not check_preci(95): msgs.append(f'💨 {atk.jugador} falla Mal!')
+            if not hit(95): msgs.append(f'{atk.jugador} falla Mal!')
             else:
-                d = dmg_base(40)
+                d = dmg(22)
                 tgt.cargas['maldita'] += 1
-                msgs.append(f'👻 Mal: -{int(d)} HP + maldición a {tgt.jugador}')
-            atk.en -= 20
-        elif hab_nombre == 'Perforador Oscuro':
-            if not check_preci(90): msgs.append(f'💨 {atk.jugador} falla Perforador Oscuro!')
-            else:
-                d = dmg_base(120)
-                tgt.defn = max(0.1, tgt.defn - 0.4)
-                msgs.append(f'🌑 Perforador: -{int(d)} HP, -0.4 def a {tgt.jugador}')
-            atk.en -= 55
-        elif hab_nombre == 'Diablo':
-            atk.hp = min(atk.maxhp, atk.hp + atk.maxhp * 0.5)
-            atk.pwr += 1.5
-            msgs.append(f'😈 Diablo: {atk.jugador} +50% HP, +1.5 pwr 2t')
-            atk.en -= 70
+                tgt.cargas['veneno']  += 1
+                # Pasiva Maestro de Pociones: 50% +1 veneno extra
+                if hit(50):
+                    tgt.cargas['veneno'] += 1
+                    msgs.append(f'Pasiva! +1 veneno extra a {tgt.jugador}')
+                msgs.append(f'Mal: -{int(d)} HP + maldicion + veneno a {tgt.jugador}')
+            atk.en -= 10
 
-    # ─── Thief ──────────────────────────────
+        elif hab_nombre == 'Perforador Oscuro':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Perforador Oscuro!')
+            else:
+                d = dmg(120)
+                tgt.defn = max(0.1, tgt.defn - 0.4)
+                eft_push(tgt, 'bdefensa_rev', -0.4, 2)   # revierte +0.4 al expirar
+                msgs.append(f'Perforador Oscuro: -{int(d)} HP, -0.4 def {tgt.jugador} 2t')
+            atk.en -= 30
+            atk.cooldowns[1] = nturnos + 4
+
+        elif hab_nombre == 'Diablo':
+            if not hit(85): msgs.append(f'{atk.jugador} falla Diablo!')
+            else:
+                # EFT: al expirar (2t), daña al enemigo según malditas acumuladas
+                # 0=100·pwr, 1=150·pwr, 2=250·pwr, 3=500·pwr, 4+=800·pwr
+                eft_push(tgt, 'diablo_exp', atk.pwr, 2)
+                msgs.append(f'Diablo invocado sobre {tgt.jugador}: '
+                             f'daño en 2t segun malditas ({tgt.cargas["maldita"]} activas)')
+            atk.en -= 80
+            atk.cooldowns[2] = nturnos + 4
+
+    # ── Thief ─────────────────────────────────────────────────────
     elif p == 'Thief':
         if hab_nombre == 'Daga':
-            if not check_preci(95): msgs.append(f'💨 {atk.jugador} falla Daga!')
+            if not hit(95): msgs.append(f'{atk.jugador} falla Daga!')
             else:
-                d = dmg_base(35)
+                d = dmg(125)
                 tgt.cargas['veneno'] += 1
                 rob = d * 0.05
                 atk.hp = min(atk.maxhp, atk.hp + rob)
                 atk.pwr += 0.1
-                msgs.append(f'🗡 Daga: -{int(d)} HP, veneno, +{int(rob)} HP robado, +0.1 pwr')
-            atk.en -= 5
-        elif hab_nombre == 'Fatiga':
-            if not check_preci(90): msgs.append(f'💨 {atk.jugador} falla Fatiga!')
-            else:
-                d = dmg_base(80)
-                msgs.append(f'🗡 Fatiga: -{int(d)} HP a {tgt.jugador}')
-            atk.en -= 40
-        elif hab_nombre == 'Energía para mí':
-            robada = min(60, tgt.en)
-            tgt.en -= robada
-            atk.en = min(atk.maxen, atk.en + robada)
-            d = dmg_base(300)
-            msgs.append(f'⚡🗡 {atk.jugador} roba {int(robada)} EN y hace -{int(d)} HP')
-            atk.en -= 0
+                msgs.append(f'Daga: -{int(d)} HP, veneno, +{int(rob)} HP, +0.1 pwr a {atk.jugador}')
+            atk.en -= 10
 
-    # ─── Shapeshifter ──────────────────────────────
-    elif p == 'Shapeshifter':
-        if hab_nombre in ('Rayo / Zarpazo', 'Rayo','Zarpazo'):
-            if atk.pantera == 0:
-                d = dmg_base(50)
-                msgs.append(f'⚡ Rayo: -{int(d)} HP a {tgt.jugador}')
+        elif hab_nombre == 'Fatiga':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Fatiga!')
             else:
-                d = dmg_base(70)
-                if randint(0,100)<=60: tgt.cargas['sangrado']+=1
-                msgs.append(f'🐾 Zarpazo: -{int(d)} HP + sangrado a {tgt.jugador}')
-            atk.en -= 30
-        elif hab_nombre in ('Escudo / Salto', 'Escudo'):
-            tgt.hp = min(tgt.maxhp, tgt.hp + 200*atk.pwr)
-            tgt.defn += 0.1
-            msgs.append(f'🛡 Escudo: +{int(200*atk.pwr)} HP, +0.1 def a {tgt.jugador}')
-            atk.en -= 60
+                d = dmg(200)
+                msgs.append(f'Fatiga: -{int(d)} HP a {tgt.jugador}')
+            atk.en -= 35
+            atk.cooldowns[1] = nturnos + 4
+
+        elif hab_nombre == 'Energía para mí':
+            if not hit(85): msgs.append(f'{atk.jugador} falla Energia para mi!')
+            else:
+                robada = min(60, tgt.en)
+                tgt.en  = max(0, tgt.en - robada)
+                atk.en  = min(atk.maxen, atk.en + robada)
+                d = dmg_fijo(300 * atk.pwr)
+                msgs.append(f'Energia para mi: roba {int(robada)} EN + -{int(d)} HP a {tgt.jugador}')
+            atk.en -= 20
+            atk.cooldowns[2] = nturnos + 3
+
+    # ── Shapeshifter ──────────────────────────────────────────────
+    elif p == 'Shapeshifter':
+        if hab_nombre in ('Rayo / Zarpazo',):
+            if atk.pantera == 0:
+                if not hit(90): msgs.append(f'{atk.jugador} falla Rayo de Energia!')
+                else:
+                    d = dmg(50)
+                    msgs.append(f'Rayo de Energia: -{int(d)} HP a {tgt.jugador}')
+                atk.en -= 25
+            else:
+                if not hit(90): msgs.append(f'{atk.jugador} falla Zarpazo!')
+                else:
+                    d = dmg(70)
+                    if hit(60): tgt.cargas['sangrado'] += 1
+                    msgs.append(f'Zarpazo: -{int(d)} HP + sangrado a {tgt.jugador}')
+                atk.en -= 30
+
+        elif hab_nombre in ('Escudo / Salto',):
+            if atk.pantera == 0:
+                if not hit(90): msgs.append(f'{atk.jugador} falla Escudo!')
+                else:
+                    shield = int(200 * atk.pwr)
+                    tgt.hp = min(tgt.maxhp, tgt.hp + shield)
+                    tgt.defn += 0.1
+                    eft_push(tgt, 'bdefensa_rev', 0.1, 3)
+                    msgs.append(f'Escudo: +{shield} HP, +0.1 def a {tgt.jugador} 3t')
+                atk.en -= 30
+                atk.cooldowns[1] = nturnos + 2
+            else:
+                if not hit(90): msgs.append(f'{atk.jugador} falla Salto!')
+                else:
+                    d = dmg(150)
+                    tgt.cargas['stun'] = max(tgt.cargas['stun'], 1)
+                    msgs.append(f'Salto: -{int(d)} HP + stun a {tgt.jugador}')
+                atk.en -= 40
+                atk.cooldowns[1] = nturnos + 3
+
         elif hab_nombre == 'Transformación':
             atk.pantera = 1 - atk.pantera
-            forma = 'PANTERA 🐾' if atk.pantera else 'HUMANO ⚡'
-            msgs.append(f'🔄 {atk.jugador} se transforma en {forma}')
-            atk.en -= 50
+            forma = 'PANTERA' if atk.pantera else 'HUMANO'
+            msgs.append(f'{atk.jugador} se transforma: ahora es {forma}')
+            atk.en -= 10
+            atk.cooldowns[2] = nturnos + 3
 
-    # ─── Healer ──────────────────────────────
+    # ── Healer ────────────────────────────────────────────────────
     elif p == 'Healer':
         if hab_nombre == 'Heal':
-            c = 100 * atk.pwr * atk.rcura
-            tgt.curar(c)
-            for k in ['veneno','sangrado','quemado','maldita']: tgt.cargas[k] = 0
-            msgs.append(f'💚 Heal: +{int(c)} HP + purificado a {tgt.jugador}')
+            if not hit(90): msgs.append(f'{atk.jugador} falla Heal!')
+            else:
+                c = 100 * atk.pwr * atk.rcura
+                cura(tgt, c)
+                tgt.cargas['hemorragia'] = max(0, tgt.cargas['hemorragia'] - 1)
+                tgt.cargas['maldita']    = max(0, tgt.cargas['maldita']    - 1)
+                msgs.append(f'Heal: +{int(c)} HP, quita 1 hemorragia y 1 maldicion a {tgt.jugador}')
             atk.en -= 40
-        elif hab_nombre == 'Bendecir':
-            tgt.defn += 0.3
-            tgt.cargas['cura'] += 3
-            msgs.append(f'✨ Bendición: +0.3 def + 3 cargas cura a {tgt.jugador}')
-            atk.en -= 50
-        elif hab_nombre == 'Proteger':
-            for lf in todos:
-                if lf.vivo and lf != atk:
-                    lf.hp = min(lf.maxhp, lf.hp + 300*atk.pwr)
-            msgs.append(f'🛡 Proteger: +{int(300*atk.pwr)} HP a todos los aliados')
-            atk.en -= 80
 
-    # ─── Mace ──────────────────────────────
+        elif hab_nombre == 'Bendecir':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Bendecir!')
+            else:
+                tgt.defn  += 0.3
+                tgt.rcura += 0.5
+                eft_push(tgt, 'bendicion_rev', (0.3, 0.5), 2)
+                msgs.append(f'Bendecir: {tgt.jugador} +0.3 def, +0.5 rcura por 2t')
+            atk.en -= 60
+            atk.cooldowns[1] = nturnos + 4
+
+        elif hab_nombre == 'Proteger':
+            if not hit(85): msgs.append(f'{atk.jugador} falla Proteger!')
+            else:
+                c = 300 * atk.pwr * atk.rcura
+                cura(tgt, c)
+                for lf in todos:
+                    if lf.vivo and lf != atk:
+                        lf.pwr  = min(lf.pwr  + 0.1, lf.pwr  + 0.1)
+                        lf.defn = min(lf.defn + 0.1, lf.defn + 0.1)
+                msgs.append(f'Proteger: +{int(c)} HP a {tgt.jugador}, +0.1 pwr/def a aliados')
+            atk.en -= 100
+            atk.cooldowns[2] = nturnos + 4
+
+    # ── Mace ──────────────────────────────────────────────────────
     elif p == 'Mace':
         if hab_nombre == 'Golpe Defensivo':
-            if not check_preci(95): msgs.append(f'💨 {atk.jugador} falla Golpe Defensivo!')
+            if not hit(95): msgs.append(f'{atk.jugador} falla Golpe Defensivo!')
             else:
-                d = dmg_base(40)
+                d = dmg(40)
                 atk.defn += 0.08
-                msgs.append(f'🔨 Golpe Defensivo: -{int(d)} HP a {tgt.jugador}, +0.08 def')
-            atk.en -= 10
+                msgs.append(f'Golpe Defensivo: -{int(d)} HP a {tgt.jugador}, +0.08 def propio')
+            atk.en -= 5
+
         elif hab_nombre == 'Agitador':
-            if not check_preci(90): msgs.append(f'💨 {atk.jugador} falla Agitador!')
+            if not hit(90): msgs.append(f'{atk.jugador} falla Agitador!')
             else:
+                total = 0
                 for lf in todos:
                     if lf != atk and lf.vivo:
-                        d = dmg_base(200) if lf == tgt else lf.recibir_dano(200*atk.pwr/lf.defn)
-                msgs.append(f'🌍 Agitador: daño en área ({int(200*atk.pwr)} aprox)')
-            atk.en -= 55
-        elif hab_nombre == 'Salto Profundo':
-            if not check_preci(85): msgs.append(f'💨 {atk.jugador} falla Salto Profundo!')
-            else:
-                d = dmg_base(300)
-                tgt.cargas['stun'] = max(tgt.cargas['stun'], 1)
-                msgs.append(f'💥 Salto Profundo: -{int(d)} HP + stun a {tgt.jugador}')
+                        d = dmg(200, dst=lf)
+                        total += d
+                msgs.append(f'Agitador: -{int(total)} HP en area')
             atk.en -= 80
+            atk.cooldowns[1] = nturnos + 3
 
-    # ─── Fires ──────────────────────────────
+        elif hab_nombre == 'Salto Profundo':
+            if not hit(85): msgs.append(f'{atk.jugador} falla Salto Profundo!')
+            else:
+                d = dmg(110)
+                tgt.cargas['stun'] = max(tgt.cargas['stun'], 2)
+                msgs.append(f'Salto Profundo: -{int(d)} HP + 2 stun a {tgt.jugador}')
+            atk.en -= 100
+            atk.cooldowns[2] = nturnos + 4
+
+    # ── Fires ─────────────────────────────────────────────────────
     elif p == 'Fires':
         if hab_nombre == 'Fuego':
-            n = max(1, int(atk.pwr))
-            tgt.cargas['quemado'] += n
-            msgs.append(f'🔥 Fuego: {n} quemaduras a {tgt.jugador}')
-            atk.en -= 15
-        elif hab_nombre == 'Llamas':
-            atk.defn += 0.5 * atk.pwr
-            msgs.append(f'🔥 Llamas: +{0.5*atk.pwr:.2f} def a {atk.jugador} 2t')
+            if not hit(90): msgs.append(f'{atk.jugador} falla Fuego!')
+            else:
+                tgt.cargas['quemado'] += 1
+                msgs.append(f'Fuego: +1 quemadura a {tgt.jugador}')
             atk.en -= 30
-        elif hab_nombre == 'Volcán':
-            n = max(4, int(4*atk.pwr))
-            for lf in todos:
-                if lf != atk and lf.vivo:
-                    lf.cargas['quemado'] += n
-            msgs.append(f'🌋 Volcán: {n} quemaduras a todos los enemigos')
-            atk.en -= 70
 
-    # ─── Snake Charmer ──────────────────────────────
+        elif hab_nombre == 'Llamas':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Llamas!')
+            else:
+                bonus = 0.5 * atk.pwr
+                atk.defn += bonus
+                eft_push(atk, 'bdefensa_rev', bonus, 2)
+                msgs.append(f'Llamas: {atk.jugador} +{bonus:.2f} def por 2t')
+            atk.en -= 40
+
+        elif hab_nombre == 'Volcan':
+            if not hit(85): msgs.append(f'{atk.jugador} falla Volcan!')
+            else:
+                n = 4
+                for lf in todos:
+                    if lf != atk and lf.vivo:
+                        lf.cargas['quemado'] += n
+                msgs.append(f'Volcan: +{n} quemaduras a todos los enemigos')
+            atk.en -= 120
+            atk.cooldowns[2] = nturnos + 4
+
+    # ── Snake Charmer ─────────────────────────────────────────────
     elif p == 'Snake Charmer':
         if hab_nombre == 'Bocajarro':
-            golpes = randint(10,50)
-            d = (5 * atk.pwr / tgt.defn) * golpes
-            if randint(0,100)<=20: tgt.cargas['sangrado']+=1
-            tgt.recibir_dano(d)
-            msgs.append(f'👊 Bocajarro: {golpes} golpes = -{int(d)} HP a {tgt.jugador}')
-            atk.en -= 10
-        elif hab_nombre == 'Ágil':
-            tgt.vel += 10
-            msgs.append(f'💨 Ágil: +10 vel a {tgt.jugador}')
-            atk.en -= 30
-        elif hab_nombre == 'Serpiente':
-            if not check_preci(80): msgs.append(f'💨 {atk.jugador} falla Serpiente!')
+            if not hit(90): msgs.append(f'{atk.jugador} falla Bocajarro!')
             else:
-                d = dmg_base(100)
-                tgt.cargas['veneno'] += 2
-                tgt.cargas['stun'] = max(tgt.cargas['stun'],1)
-                msgs.append(f'🐍 Serpiente: -{int(d)} HP, 2 venenos, stun a {tgt.jugador}')
-            atk.en -= 60
+                golpes = randint(10, 50)
+                d = golpes * 5 * atk.pwr / tgt.defn
+                tgt.recibir_dano(d)
+                if hit(20): tgt.cargas['sangrado'] += 1
+                msgs.append(f'Bocajarro: {golpes} golpes = -{int(d)} HP a {tgt.jugador}')
+            atk.en -= 30
 
-    # ─── Apostador ──────────────────────────────
+        elif hab_nombre == 'Agil':
+            tgt.vel += 8
+            msgs.append(f'Agil: +8 vel a {tgt.jugador}')
+            atk.en -= 40
+
+        elif hab_nombre == 'Ágil':
+            tgt.vel += 8
+            msgs.append(f'Agil: +8 vel a {tgt.jugador}')
+            atk.en -= 40
+
+        elif hab_nombre == 'Serpiente':
+            if not hit(85): msgs.append(f'{atk.jugador} falla Serpiente!')
+            else:
+                d = dmg(200)
+                tgt.cargas['veneno'] += 2
+                tgt.cargas['stun']    = max(tgt.cargas['stun'], 1)
+                msgs.append(f'Serpiente: -{int(d)} HP, 2 venenos, stun a {tgt.jugador}')
+            atk.en -= 160
+            atk.cooldowns[2] = nturnos + 3
+
+    # ── Apostador ─────────────────────────────────────────────────
     elif p == 'Apostador':
         if hab_nombre == 'Apostar':
-            r = randint(1,3)
+            r = randint(1, 3)
             if r == 1:
-                d = dmg_base(180)
-                msgs.append(f'🎲 Suerte! Apostador: -{int(d)} HP a {tgt.jugador}')
+                d = dmg(180)
+                msgs.append(f'Apuesta! -{int(d)} HP a {tgt.jugador}')
             elif r == 2:
-                atk.curar(80)
-                msgs.append(f'🎲 Suerte media: Apostador +80 HP')
+                cura(atk, 80)
+                msgs.append(f'Apuesta! {atk.jugador} +80 HP')
             else:
                 atk.pwr += 0.1
-                msgs.append(f'🎲 Pequeña suerte: Apostador +0.1 pwr')
-        elif hab_nombre == 'Invocar':
-            r = randint(1,3)
-            msgs.append(f'🎲 Apostador invoca criatura #{r} (efecto especial)')
-        elif hab_nombre == 'Bomba':
-            if randint(0,100) <= 50:
-                d = dmg_base(800)
-                msgs.append(f'💣 BOMBA! -{int(d)} HP a {tgt.jugador}')
-            else:
-                dmg = 600 * atk.pwr / atk.defn
-                atk.hp -= dmg
-                msgs.append(f'💣 La bomba explota a {atk.jugador}: -{int(dmg)} HP propio!')
+                msgs.append(f'Apuesta! {atk.jugador} +0.1 pwr')
+            atk.en -= 3
 
-    # ─── Natural / Natural Heal ──────────────────────────────
-    elif p in ('Natural','Natural Heal'):
-        if hab_nombre == 'Plantar':
-            tgt.cargas['cura'] += 2
-            tgt.cargas['quemado'] = max(0, tgt.cargas['quemado']-1)
-            msgs.append(f'🌿 Plantar: 2 cargas cura + -1 quemadura a {tgt.jugador}')
+        elif hab_nombre == 'Invocar':
+            r = randint(1, 5)
+            tabla = {1:'Sombra (30 dmg/t)', 2:'Sol (cura aliados)',
+                     3:'Lluvia (quita quemaduras)', 4:'Pajaro (+8 vel)',
+                     5:'Rayo (100 dmg inmediato)'}
+            resultado = tabla.get(r, '???')
+            if r == 5:
+                d = dmg_fijo(100)
+            msgs.append(f'Invocar: {resultado}')
+            atk.en -= 10
+
+        elif hab_nombre == 'Bomba':
+            if hit(50):
+                d = dmg(800)
+                msgs.append(f'BOMBA! -{int(d)} HP a {tgt.jugador}')
+            else:
+                dmg_propio = 600 * atk.pwr / atk.defn
+                atk.hp = max(0, atk.hp - dmg_propio)
+                msgs.append(f'Bomba mal! {atk.jugador} -{int(dmg_propio)} HP propio')
             atk.en -= 20
-        elif hab_nombre in ('Zarza',):
-            d = dmg_base(140)
-            tgt.cargas['sangrado'] += 1
-            msgs.append(f'🌵 Zarza: -{int(d)} HP + sangrado a {tgt.jugador}')
-            atk.en -= 40
-        elif hab_nombre in ('Protección',):
-            atk.curar(100*atk.pwr)
-            atk.defn += 0.3
-            msgs.append(f'🛡 Protección: +{int(100*atk.pwr)} HP, +0.3 def a {atk.jugador}')
-            atk.en -= 50
+            atk.cooldowns[2] = nturnos + 2
+
+    # ── Natural / Natural Heal ─────────────────────────────────────
+    elif p in ('Natural', 'Natural Heal'):
+        if hab_nombre == 'Plantar':
+            tgt.cargas['cura']    += 1
+            tgt.cargas['quemado'] = max(0, tgt.cargas['quemado'] - 1)
+            msgs.append(f'Plantar: +1 carga cura, -1 quemadura a {tgt.jugador}')
+            atk.en -= 8
+
+        elif hab_nombre == 'Zarza':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Zarza!')
+            else:
+                d = dmg_fijo(140)
+                tgt.cargas['sangrado'] += 1
+                msgs.append(f'Zarza: -{int(d)} HP + sangrado a {tgt.jugador}')
+            atk.en -= 60
+
         elif hab_nombre == 'Naturaleza':
             for lf in todos:
                 if lf.vivo:
-                    c = 28 * lf.cargas['cura'] * lf.rcura
-                    lf.curar(c)
-            msgs.append(f'🌿 Naturaleza: cura por cargas a todos')
-            atk.en -= 40
+                    c = 28 * lf.cargas.get('cura', 0) * lf.rcura
+                    if c > 0: cura(lf, c)
+            msgs.append(f'Naturaleza: cura segun cargas a todos')
+            atk.en -= 40 if p == 'Natural Heal' else 100
+            if p == 'Natural': atk.cooldowns[2] = nturnos + 3
 
-    # ─── Diablillo ──────────────────────────────
+        elif hab_nombre == 'Protección':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Proteccion!')
+            else:
+                shield = int(252 * atk.pwr)
+                tgt.hp = min(tgt.maxhp, tgt.hp + shield)
+                tgt.defn += 0.3
+                eft_push(tgt, 'bdefensa_rev', 0.3, 3)
+                msgs.append(f'Proteccion: +{shield} HP, +0.3 def {tgt.jugador} 3t')
+            atk.en -= 40 if p == 'Natural' else 50
+            if p == 'Natural Heal': atk.cooldowns[2] = nturnos + 3
+
+    # ── Diablillo ─────────────────────────────────────────────────
     elif p == 'Diablillo':
-        if hab_nombre == 'Llamarada Ígnea':
-            d = dmg_base(80)
-            tgt.cargas['quemado'] += 1
-            atk.hp = min(atk.maxhp, atk.hp + 15)
-            msgs.append(f'😈🔥 Llamarada: -{int(d)} HP, quemadura a {tgt.jugador}, +15 HP propio')
-            atk.en -= 15
-        elif hab_nombre == 'Mordida Ígnea':
-            tgt.cargas['quemado'] += 2
-            atk.hp = min(atk.maxhp, atk.hp + 30)
-            msgs.append(f'😈 Mordida Ígnea: 2 quemaduras a {tgt.jugador}, +30 HP propio')
-            atk.en -= 25
-        elif hab_nombre == 'Ráfaga Ígnea':
-            d = dmg_base(260)
-            tgt.cargas['quemado'] += 3
-            atk.hp = min(atk.maxhp, atk.hp + 45)
-            msgs.append(f'😈💥 Ráfaga Ígnea: -{int(d)} HP, 3 quemaduras, +45 HP propio')
-            atk.en -= 60
+        if hab_nombre == 'Llamarada Ignea' or hab_nombre == 'Llamarada Ígnea':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Llamarada Ignea!')
+            else:
+                d = dmg_fijo(80)
+                tgt.cargas['quemado'] += 1
+                atk.hp = min(atk.maxhp, atk.hp + 15)
+                # Pasiva Corazon de Fuego: +0.04 pwr al aplicar quemadura
+                atk.pwr += 0.04
+                msgs.append(f'Llamarada Ignea: -{int(d)} HP, quemadura, +15 HP, +0.04 pwr propio')
+            atk.en -= 30
+            atk.cooldowns[0] = nturnos + 2
 
-    # ─── Chiquitin ──────────────────────────────
+        elif hab_nombre == 'Mordida Ignea' or hab_nombre == 'Mordida Ígnea':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Mordida Ignea!')
+            else:
+                tgt.cargas['quemado'] += 2
+                atk.hp = min(atk.maxhp, atk.hp + 30)
+                atk.pwr += 0.04 * 2
+                msgs.append(f'Mordida Ignea: 2 quemaduras a {tgt.jugador}, +30 HP propio')
+            atk.en -= 55
+            atk.cooldowns[1] = nturnos + 2
+
+        elif hab_nombre == 'Rafaga Ignea' or hab_nombre == 'Ráfaga Ígnea':
+            if not hit(80): msgs.append(f'{atk.jugador} falla Rafaga Ignea!')
+            else:
+                d = dmg_fijo(260)
+                tgt.cargas['quemado'] += 3
+                atk.hp = min(atk.maxhp, atk.hp + 45)
+                atk.pwr += 0.04 * 3
+                msgs.append(f'Rafaga Ignea: -{int(d)} HP, 3 quemaduras, +45 HP, +0.12 pwr')
+            atk.en -= 180
+            atk.cooldowns[2] = nturnos + 4
+
+    # ── Chiquitin ─────────────────────────────────────────────────
     elif p == 'Chiquitin':
         if hab_nombre == 'Bocajarro':
-            golpes = randint(10,50)
-            d = (5 * atk.pwr / tgt.defn) * golpes
-            if randint(0,100)<=20: tgt.cargas['sangrado']+=1
-            tgt.recibir_dano(d)
-            msgs.append(f'👊 Bocajarro: {golpes} golpes = -{int(d)} HP a {tgt.jugador}')
+            if not hit(95): msgs.append(f'{atk.jugador} falla Bocajarro!')
+            else:
+                golpes = randint(10, 50)
+                d = golpes * 5 * atk.pwr / tgt.defn
+                tgt.recibir_dano(d)
+                if hit(20): tgt.cargas['sangrado'] += 1
+                msgs.append(f'Bocajarro: {golpes} golpes = -{int(d)} HP a {tgt.jugador}')
             atk.en -= 2
-        elif hab_nombre == 'Mordida Ígnea':
-            tgt.cargas['quemado'] += 2
-            msgs.append(f'😈 Mordida Ígnea: 2 quemaduras a {tgt.jugador}')
+            atk.cooldowns[0] = nturnos + 2
+
+        elif hab_nombre == 'Mordida Ignea' or hab_nombre == 'Mordida Ígnea':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Mordida Ignea!')
+            else:
+                tgt.cargas['quemado'] += 2
+                msgs.append(f'Mordida Ignea: 2 quemaduras a {tgt.jugador}')
             atk.en -= 8
+            atk.cooldowns[1] = nturnos + 2
+
         elif hab_nombre == 'Ira':
             atk.pwr += 1.0
-            msgs.append(f'💢 Ira: {atk.jugador} +1 pwr')
+            msgs.append(f'Ira: {atk.jugador} +1 pwr permanente')
             atk.en -= 10
+            atk.cooldowns[2] = nturnos + 2
 
-    # ─── Guadaña ──────────────────────────────
+    # ── Guadana ───────────────────────────────────────────────────
     elif p == 'Guadaña':
         if hab_nombre == 'Golpe Desgarrador':
-            d = dmg_base(60)
-            tgt.cargas['sangrado'] += 1
-            msgs.append(f'⚔ Golpe Desgarrador: -{int(d)} HP + sangrado a {tgt.jugador}')
+            if not hit(90): msgs.append(f'{atk.jugador} falla Golpe Desgarrador!')
+            else:
+                # Daño variable segun % HP del enemigo (más daño si enemigo tiene más HP)
+                factor = tgt.hp / tgt.maxhp if tgt.maxhp > 0 else 1
+                base   = int(60 + 140 * factor)
+                d      = dmg(base)
+                tgt.cargas['sangrado'] += 1
+                msgs.append(f'Golpe Desgarrador: -{int(d)} HP + sangrado ({base} base)')
             atk.en -= 20
-        elif hab_nombre == 'Corte Mortal':
-            d = dmg_base(140)
-            tgt.defn = max(0.1, tgt.defn - 0.3)
-            msgs.append(f'⚔ Corte Mortal: -{int(d)} HP, -0.3 def a {tgt.jugador}')
-            atk.en -= 50
-        elif hab_nombre == 'Segar':
-            d1 = dmg_base(200)
-            d2 = dmg_base(200)
-            msgs.append(f'💀 Segar: doble impacto -{int(d1+d2)} HP total a {tgt.jugador}')
-            atk.en -= 80
 
-    # ─── Crossbow ──────────────────────────────
+        elif hab_nombre == 'Corte Mortal':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Corte Mortal!')
+            else:
+                d = dmg_fijo(140)
+                tgt.defn = max(0.1, tgt.defn - 0.3)
+                eft_push(tgt, 'bdefensa_rev', -0.3, 2)
+                msgs.append(f'Corte Mortal: -{int(d)} HP, -0.3 def {tgt.jugador} 2t')
+            atk.en -= 50
+            atk.cooldowns[1] = nturnos + 4
+
+        elif hab_nombre == 'Segar':
+            if not hit(85): msgs.append(f'{atk.jugador} falla Segar!')
+            else:
+                d1 = dmg_fijo(200); d2 = dmg_fijo(200)
+                msgs.append(f'Segar: doble impacto -{int(d1+d2)} HP a {tgt.jugador}')
+            atk.en -= 90
+            atk.cooldowns[2] = nturnos + 5
+
+    # ── Crossbow ──────────────────────────────────────────────────
     elif p == 'Crossbow':
         if hab_nombre == 'Flecha Explosiva':
-            d1 = dmg_base(50); d2 = dmg_base(50)
-            msgs.append(f'🏹💥 Flecha Explosiva: 2×{int((d1+d2)/2)} = -{int(d1+d2)} HP a {tgt.jugador}')
-            atk.en -= 30
-        elif hab_nombre == 'Eliminador de Ruido':
-            d = dmg_base(120)
-            tgt.cargas['silenciado'] = max(tgt.cargas['silenciado'],2)
-            msgs.append(f'🔇 Eliminar Ruido: -{int(d)} HP + silencia 2t a {tgt.jugador}')
-            atk.en -= 50
-        elif hab_nombre == 'Disparo Explosivo':
-            d = dmg_base(150)
-            msgs.append(f'💥 Disparo Explosivo: -{int(d)} HP + bomba 350 próx turno a {tgt.jugador}')
-            atk.en -= 70
+            if not hit(90): msgs.append(f'{atk.jugador} falla Flecha Explosiva!')
+            else:
+                d1 = dmg(90); d2 = dmg(90)
+                msgs.append(f'Flecha Explosiva: 2 flechas -{int(d1+d2)} HP a {tgt.jugador}')
+            atk.en -= 3
 
-    # ─── Support ──────────────────────────────
+        elif hab_nombre == 'Eliminador de Ruido':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Eliminador de Ruido!')
+            else:
+                d = dmg(120)
+                tgt.cargas['silenciado'] = max(tgt.cargas['silenciado'], 2)
+                msgs.append(f'Eliminar Ruido: -{int(d)} HP + silencia 2t a {tgt.jugador}')
+            atk.en -= 40
+            atk.cooldowns[1] = nturnos + 4
+
+        elif hab_nombre == 'Disparo Explosivo':
+            if not hit(80): msgs.append(f'{atk.jugador} falla Disparo Explosivo!')
+            else:
+                d = dmg(50)
+                # Bomba EFT: 350·pwr dmg el siguiente turno
+                eft_push(tgt, 'bomba_crossbow', 350 * atk.pwr, 2)
+                msgs.append(f'Disparo Explosivo: -{int(d)} HP + bomba 350 en 1 turno')
+            atk.en -= 90
+            atk.cooldowns[2] = nturnos + 5
+
+    # ── Support ───────────────────────────────────────────────────
     elif p == 'Support':
         if hab_nombre == 'Escudo':
-            e = 80 * atk.pwr
-            tgt.hp = min(tgt.maxhp, tgt.hp + e)
-            tgt.defn += 0.1
-            msgs.append(f'🛡 Escudo: +{int(e)} HP, +0.1 def a {tgt.jugador}')
-            atk.en -= 40
+            if not hit(90): msgs.append(f'{atk.jugador} falla Escudo!')
+            else:
+                e = int(80 * atk.pwr)
+                tgt.hp = min(tgt.maxhp, tgt.hp + e)
+                tgt.defn += 0.05
+                msgs.append(f'Escudo: +{e} HP, +0.05 def a {tgt.jugador}')
+            atk.en -= 10
+
         elif hab_nombre == 'Agilizar':
-            tgt.vel += 10
-            msgs.append(f'💨 Agilizar: +10 vel a {tgt.jugador}')
+            if not hit(90): msgs.append(f'{atk.jugador} falla Agilizar!')
+            else:
+                tgt.vel += 8
+                msgs.append(f'Agilizar: +8 vel a {tgt.jugador}')
             atk.en -= 30
+            atk.cooldowns[1] = nturnos + 2
+
         elif hab_nombre == 'Purificador':
             for k in ['veneno','sangrado','quemado','maldita','hemorragia',
                       'stun','hielo','paralizado','silenciado','inmovilizado']:
                 tgt.cargas[k] = 0
-            msgs.append(f'✨ Purificador: todas las cargas negativas de {tgt.jugador} limpiadas')
-            atk.en -= 50
+            msgs.append(f'Purificador: todas las cargas negativas de {tgt.jugador} limpiadas')
+
         elif hab_nombre == 'Sobrecargar':
-            tgt.pwr += 3
-            msgs.append(f'💪 Sobrecargar: {tgt.jugador} +3 pwr por 3t')
-            atk.en -= 80
-
-    # ─── Loco ──────────────────────────────
-    elif p == 'Loco':
-        if hab_nombre == 'Puñetazo':
-            if not check_preci(90): msgs.append(f'💨 {atk.jugador} falla Puñetazo!')
+            if not hit(85): msgs.append(f'{atk.jugador} falla Sobrecargar!')
             else:
-                d = dmg_base(50)
-                tgt.cargas['silenciado'] = max(tgt.cargas['silenciado'],1)
-                msgs.append(f'👊 Puñetazo: -{int(d)} HP + silencia 1t a {tgt.jugador}')
+                tgt.pwr += 3
+                eft_push(tgt, 'apower_rev', 3, 3)
+                msgs.append(f'Sobrecargar: {tgt.jugador} +3 pwr por 3t')
             atk.en -= 20
-        elif hab_nombre == 'Calma':
-            c = atk.cargas['locura']
-            atk.curar(c)
-            msgs.append(f'😌 Calma: {atk.jugador} cura {c} HP (= locura)')
-            atk.en -= 30
-        elif hab_nombre == 'Moneda':
-            if randint(0,1): atk.cargas['locura'] = min(100, atk.cargas['locura']+20)
-            else:             atk.cargas['locura'] = max(0,   atk.cargas['locura']-10)
-            msgs.append(f'🎲 Moneda: locura de {atk.jugador} → {atk.cargas["locura"]}')
+            atk.cooldowns[2] = nturnos + 4
 
-    # ─── Root ──────────────────────────────
+    # ── Loco ──────────────────────────────────────────────────────
+    elif p == 'Loco':
+        if hab_nombre == 'Punетazo' or hab_nombre == 'Puñetazo':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Punetazo!')
+            else:
+                # Locura: puede redirigir el golpe al propio Loco
+                locura = atk.cargas.get('locura', 0)
+                if locura > 0 and hit(locura):
+                    # Auto-golpe por locura
+                    d = dmg(40, src=atk, dst=atk)
+                    msgs.append(f'Locura! Punetazo: {atk.jugador} se golpea a si mismo -{int(d)} HP')
+                else:
+                    d = dmg(40)
+                    tgt.cargas['silenciado'] = max(tgt.cargas['silenciado'], 1)
+                    msgs.append(f'Punetazo: -{int(d)} HP + silencia {tgt.jugador}')
+            atk.en -= 4
+            atk.cooldowns[0] = nturnos + 2
+
+        elif hab_nombre == 'Calma':
+            locura = atk.cargas.get('locura', 0)
+            cura(atk, locura)
+            atk.cargas['locura'] = max(0, locura - 20)
+            msgs.append(f'Calma: {atk.jugador} cura {locura} HP, reduce locura')
+            atk.en -= 7
+
+        elif hab_nombre == 'Moneda':
+            # Cara: +100 locura propia +30 al enemigo / Cruz: -locura
+            if hit(50):
+                atk.cargas['locura']  = min(100, atk.cargas.get('locura', 0) + 100)
+                tgt.cargas['locura']  = min(100, tgt.cargas.get('locura', 0) + 30)
+                msgs.append(f'Moneda CARA: {atk.jugador} +100 locura, {tgt.jugador} +30 locura')
+            else:
+                atk.cargas['locura'] = max(0, atk.cargas.get('locura', 0) - 50)
+                msgs.append(f'Moneda CRUZ: {atk.jugador} -50 locura')
+            atk.en -= 18
+            atk.cooldowns[2] = nturnos + 3
+
+    # ── Root ──────────────────────────────────────────────────────
     elif p == 'Root':
         if hab_nombre == 'Defensa Suprema':
-            atk.defn += 0.2
-            msgs.append(f'🌱 Defensa: {atk.jugador} +0.2 def 2t')
-            atk.en -= 30
-        elif hab_nombre == 'Raíces':
-            d = dmg_base(130)
-            tgt.cargas['inmovilizado'] = max(tgt.cargas['inmovilizado'],2)
-            msgs.append(f'🌿 Raíces: -{int(d)} HP + inmoviliza 2t a {tgt.jugador}')
-            atk.en -= 50
-        elif hab_nombre == 'Conexión':
-            msgs.append(f'🔗 Conexión: {atk.jugador} enlaza daño con {tgt.jugador} 2t')
-            atk.en -= 60
+            if not hit(90): msgs.append(f'{atk.jugador} falla Defensa Suprema!')
+            else:
+                atk.defn += 0.2
+                eft_push(atk, 'bdefensa_rev', 0.2, 2)
+                msgs.append(f'Defensa Suprema: {atk.jugador} +0.2 def por 2t')
+            atk.en -= 15
+            atk.cooldowns[0] = nturnos + 2
 
-    # ─── Santa Claus ──────────────────────────────
+        elif hab_nombre == 'Raices' or hab_nombre == 'Raíces':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Raices!')
+            else:
+                d = dmg_fijo(130)
+                tgt.cargas['inmovilizado'] = max(tgt.cargas['inmovilizado'], 2)
+                msgs.append(f'Raices: -{int(d)} HP + inmoviliza 2t a {tgt.jugador}')
+            atk.en -= 30
+            atk.cooldowns[1] = nturnos + 4
+
+        elif hab_nombre == 'Conexion' or hab_nombre == 'Conexión':
+            if not hit(85): msgs.append(f'{atk.jugador} falla Conexion!')
+            else:
+                # Marca: el daño que reciba el objetivo los proximos 3t va a Root
+                eft_push(tgt, 'conexion_root', atk, 3)
+                msgs.append(f'Conexion: todo el dano que reciba {tgt.jugador} '
+                             f'se transfiere a {atk.jugador} por 3t')
+            atk.en -= 50
+            atk.cooldowns[2] = nturnos + 6
+
+    # ── Santa Claus ───────────────────────────────────────────────
     elif p == 'Santa Claus':
         if hab_nombre == 'Bola de Nieve':
-            if not check_preci(90): msgs.append(f'💨 {atk.jugador} falla Bola de Nieve!')
+            if not hit(90): msgs.append(f'{atk.jugador} falla Bola de Nieve!')
             else:
-                d = dmg_base(40)
-                tgt.cargas['hielo'] = max(tgt.cargas['hielo'],1)
-                msgs.append(f'❄ Bola de Nieve: -{int(d)} HP + congela {tgt.jugador}')
-            atk.en -= 15
+                tgt.cargas['hielo'] = max(tgt.cargas['hielo'], 1)
+                msgs.append(f'Bola de Nieve: {tgt.jugador} congelado 1t')
+                # Pasiva Nieve: 25% congelar extra
+                if hit(25):
+                    tgt.cargas['hielo'] = max(tgt.cargas['hielo'], 2)
+                    msgs.append(f'Pasiva Nieve! {tgt.jugador} congelado 1t extra')
+            atk.en -= 2
+            atk.cooldowns[0] = nturnos + 2
+
         elif hab_nombre == 'Mierda de Reno':
-            d = dmg_base(60)
-            tgt.cargas['silenciado'] = max(tgt.cargas['silenciado'],2)
-            msgs.append(f'🦌💩 Mierda de Reno: -{int(d)} HP + silencia 2t {tgt.jugador}')
-            atk.en -= 30
-        elif hab_nombre == 'Estrés Navideño':
-            for lf in todos:
-                if lf != atk and lf.vivo:
-                    lf.pwr = max(0.1, lf.pwr - 0.6)
-            msgs.append(f'😰 Estrés Navideño: -0.6 pwr a todos los enemigos 2t')
-            atk.en -= 60
+            if not hit(90): msgs.append(f'{atk.jugador} falla Mierda de Reno!')
+            else:
+                tgt.cargas['silenciado'] = max(tgt.cargas['silenciado'], 2)
+                tgt.cargas['hielo']      = max(tgt.cargas['hielo'], 1)
+                msgs.append(f'Mierda de Reno: {tgt.jugador} silenciado 2t + hielo 1t')
+                if hit(25):
+                    tgt.cargas['hielo'] = max(tgt.cargas['hielo'], 2)
+                    msgs.append(f'Pasiva Nieve! hielo extra')
+            atk.en -= 8
+            atk.cooldowns[1] = nturnos + 4
 
-    # ─── Werewolf ──────────────────────────────
+        elif hab_nombre == 'Estres Navideño' or hab_nombre == 'Estrés Navideño':
+            if not hit(85): msgs.append(f'{atk.jugador} falla Estres Navideno!')
+            else:
+                for lf in todos:
+                    if lf != atk and lf.vivo:
+                        lf.pwr = max(0.1, lf.pwr - 0.6)
+                msgs.append(f'Estres Navideno: -0.6 pwr a todos los enemigos')
+                if hit(25):
+                    for lf in todos:
+                        if lf != atk and lf.vivo:
+                            lf.cargas['hielo'] = max(lf.cargas['hielo'], 1)
+                    msgs.append(f'Pasiva Nieve! todos congelados')
+            atk.en -= 10
+
+    # ── Werewolf ──────────────────────────────────────────────────
     elif p == 'Werewolf':
-        if hab_nombre == 'Ensangrentar':
-            d = dmg_base(45)
-            tgt.cargas['sangrado'] += 1
-            rob = d * 0.04
-            atk.hp = min(atk.maxhp, atk.hp + rob)
-            msgs.append(f'🐺 Ensangrentar: -{int(d)} HP + sangrado + {int(rob)} HP robado')
-            atk.en -= 20
-        elif hab_nombre == 'Morder':
-            d = dmg_base(80)
-            rob = d * 0.04
-            atk.hp = min(atk.maxhp, atk.hp + rob)
-            msgs.append(f'🐺 Morder: -{int(d)} HP + {int(rob)} HP robado a {tgt.jugador}')
-            atk.en -= 35
-        elif hab_nombre == 'Abalanzarse':
-            d = dmg_base(120)
-            tgt.cargas['hemorragia'] += 1
-            msgs.append(f'🐺💀 Abalanzarse: -{int(d)} HP + hemorragia a {tgt.jugador}')
-            atk.en -= 60
+        if not hasattr(atk, 'sangre'): atk.sangre = 100
 
-    # ─── Runeforge ──────────────────────────────
+        if hab_nombre == 'Ensangrentar':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Ensangrentar!')
+            else:
+                d = dmg_fijo(45)
+                robo_sangre = randint(1, 5)
+                tgt.sangre  = max(0, tgt.sangre - robo_sangre)
+                atk.sangre += robo_sangre
+                if hit(35): tgt.cargas['sangrado'] += 1
+                msgs.append(f'Ensangrentar: -{int(d)} HP, roba {robo_sangre} sangre')
+            atk.en -= 10
+
+        elif hab_nombre == 'Morder':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Morder!')
+            else:
+                d = dmg_fijo(80)
+                robo_sangre = randint(4, 8)
+                tgt.sangre  = max(0, tgt.sangre - robo_sangre)
+                atk.sangre += robo_sangre
+                # lifesteal 4%
+                lifesteal = d * 0.04
+                atk.hp = min(atk.maxhp, atk.hp + lifesteal)
+                msgs.append(f'Morder: -{int(d)} HP, roba {robo_sangre} sangre, '
+                             f'+{int(lifesteal)} HP lifesteal')
+            atk.en -= 30
+            atk.cooldowns[1] = nturnos + 2
+
+        elif hab_nombre == 'Abalanzarse':
+            if not hit(85): msgs.append(f'{atk.jugador} falla Abalanzarse!')
+            else:
+                d = dmg_fijo(120)
+                robo_sangre = randint(10, 20)
+                tgt.sangre  = max(0, tgt.sangre - robo_sangre)
+                atk.sangre += robo_sangre
+                if hit(60): tgt.cargas['hemorragia'] += 1
+                msgs.append(f'Abalanzarse: -{int(d)} HP, roba {robo_sangre} sangre, '
+                             f'60% hemorragia')
+            atk.en -= 60
+            atk.cooldowns[2] = nturnos + 4
+
+    # ── Runeforge ─────────────────────────────────────────────────
     elif p == 'Runeforge':
         if hab_nombre == 'Aplastar':
-            d = dmg_base(90)
-            msgs.append(f'🔨 Aplastar: -{int(d)} HP a {tgt.jugador}')
-            atk.en -= 30
-        elif hab_nombre == 'Runa':
-            tgt.cargas['invencible'] = max(tgt.cargas['invencible'],1)
-            msgs.append(f'[Runa] {tgt.jugador} es invulnerable 1t (la runa acumula vida cada turno)')
-            atk.en -= 90
-        elif hab_nombre == 'Forjar':
-            tgt.pwr += 0.4; tgt.defn += 0.3
-            msgs.append(f'[Forja] {tgt.jugador} +0.4 pwr, +0.3 def 2t')
-            atk.en -= 30
+            if not hit(90): msgs.append(f'{atk.jugador} falla Aplastar!')
+            else:
+                d = dmg_fijo(90)
+                msgs.append(f'Aplastar: -{int(d)} HP a {tgt.jugador}')
+            atk.en -= 10
 
+        elif hab_nombre == 'Forjar':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Forjar!')
+            else:
+                if not hasattr(atk, 'vida_runa'): atk.vida_runa = 0
+                calidad = randint(1, 3)   # 1=mala, 2=normal, 3=buena (mejor con vida_runa alta)
+                bonus   = calidad * 0.1 * (1 + atk.vida_runa / 200)
+                if hit(50):
+                    tgt.pwr  += bonus
+                    msgs.append(f'Forjar: pieza calidad {calidad} -> {tgt.jugador} +{bonus:.2f} pwr')
+                else:
+                    tgt.defn += bonus
+                    msgs.append(f'Forjar: pieza calidad {calidad} -> {tgt.jugador} +{bonus:.2f} def')
+            atk.en -= 30
+            atk.cooldowns[1] = nturnos + 5
+
+        elif hab_nombre == 'Runa':
+            if not hit(80): msgs.append(f'{atk.jugador} falla Runa!')
+            else:
+                tgt.cargas['invencible'] = max(tgt.cargas['invencible'], 1)
+                if not hasattr(tgt, 'vida_runa'): tgt.vida_runa = 100
+                msgs.append(f'Runa: {tgt.jugador} invulnerable mientras la runa tenga vida '
+                             f'(vida_runa={tgt.vida_runa})')
+            atk.en -= 90
+            atk.cooldowns[2] = nturnos + 7
+
+    # ── Serenità ──────────────────────────────────────────────────
     elif p == 'Serenità':
         if hab_nombre == 'Armonia':
-            # >50% HP: cura 150·pwr + +0.05 pwr al objetivo
-            # <50% HP: cura 250·pwr (emergencia)
-            # =50% HP (caso raro): cura 350·pwr + +0.15 pwr
-            pct_hp = tgt.hp / tgt.maxhp if tgt.maxhp > 0 else 1
-            if pct_hp > 0.50:
-                cantidad = 150 * atk.pwr * atk.rcura
-                tgt.curar(cantidad)
-                tgt.pwr += 0.05
-                msgs.append(f'🎵 Armonia: {tgt.jugador} +{int(cantidad)} HP, +0.05 pwr')
+            if not hit(100): msgs.append(f'{atk.jugador} falla Armonia!')
             else:
-                cantidad = 250 * atk.pwr * atk.rcura
-                tgt.curar(cantidad)
-                msgs.append(f'🎵 Armonia (emergencia): {tgt.jugador} +{int(cantidad)} HP')
+                pct = tgt.hp / tgt.maxhp if tgt.maxhp > 0 else 1
+                if pct > 0.50:
+                    c = 150 * atk.pwr * tgt.rcura
+                    cura(tgt, c)
+                    tgt.pwr += 0.05
+                    msgs.append(f'Armonia: {tgt.jugador} +{int(c)} HP, +0.05 pwr')
+                elif pct > 0.25:
+                    c = 250 * atk.pwr * tgt.rcura
+                    cura(tgt, c)
+                    msgs.append(f'Armonia (media vida): {tgt.jugador} +{int(c)} HP')
+                else:
+                    c = 350 * atk.pwr * tgt.rcura
+                    cura(tgt, c)
+                    tgt.pwr += 0.15
+                    msgs.append(f'Armonia (critico): {tgt.jugador} +{int(c)} HP, +0.15 pwr')
             atk.en -= 15
-        elif hab_nombre == 'Scelta':
-            # La elección se hace automáticamente basada en la necesidad del objetivo:
-            # si pwr < defn → sube pwr; si defn < pwr → sube defn; si igual → sube pwr
-            if tgt.pwr <= tgt.defn:
-                tgt.pwr += 0.15 * atk.pwr
-                msgs.append(f'🌟 Scelta: {tgt.jugador} +{0.15*atk.pwr:.3f} pwr')
-            else:
-                tgt.defn += 0.15 * atk.pwr
-                msgs.append(f'🌟 Scelta: {tgt.jugador} +{0.15*atk.pwr:.3f} def')
-            atk.en -= 40
-        elif hab_nombre == 'Luce':
-            # Purifica todos los estados negativos del objetivo
-            for k in ['veneno','sangrado','quemado','hemorragia','maldita',
-                      'stun','hielo','silenciado','inmovilizado','paralizado']:
-                tgt.cargas[k] = 0
-            # Duplicar Costanza durante 4 turnos
-            if not hasattr(atk, 'costanza'): atk.costanza = 30
-            if not hasattr(atk, 'tcostanza'): atk.tcostanza = 0
-            atk.costanza   = 60
-            atk.tcostanza  = nturnos + 5   # expira en nturnos+5
-            msgs.append(f'💫 Luce di Parma: {tgt.jugador} purificado, Costanza ×2 (4 turnos)')
-            atk.en -= 60
+            atk.cooldowns[0] = nturnos + 2
 
-    # Regenerar energía base
+        elif hab_nombre == 'Scelta':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Scelta!')
+            else:
+                if tgt.pwr <= tgt.defn:
+                    tgt.pwr  += 0.15
+                    msgs.append(f'Scelta: {tgt.jugador} +0.15 pwr')
+                else:
+                    tgt.defn += 0.15
+                    msgs.append(f'Scelta: {tgt.jugador} +0.15 def')
+            atk.en -= 40
+            atk.cooldowns[1] = nturnos + 4
+
+        elif hab_nombre == 'Luce':
+            if not hit(90): msgs.append(f'{atk.jugador} falla Luce!')
+            else:
+                for k in ['veneno','sangrado','quemado','hemorragia','maldita',
+                          'stun','hielo','silenciado','inmovilizado','paralizado']:
+                    tgt.cargas[k] = 0
+                if not hasattr(atk, 'costanza'):  atk.costanza  = 30
+                if not hasattr(atk, 'tcostanza'): atk.tcostanza = 0
+                atk.costanza  = 60
+                atk.tcostanza = nturnos + 5
+                msgs.append(f'Luce: {tgt.jugador} purificado, Costanza x2 por 4t')
+            atk.en -= 60
+            atk.cooldowns[2] = nturnos + 6
+
+    # ── Regenerar energía base (+4 por turno en el motor) ─────────
     atk.en = min(atk.maxen, atk.en + 4)
 
     if not msgs:
         msgs.append(f'{atk.jugador} usa {hab_nombre}')
     return msgs
+
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -2127,10 +2517,10 @@ def draw_card(surf, lf, x, y, activo, seleccionable, nturnos):
     draw_bar(surf, x+PAD, sy, bw, 8, max(0,lf.hp), lf.maxhp, bar_color(pct)); sy += 10
 
     # ── EN: número encima, barra debajo ──
-    en_str = f'EN  {int(lf.en)} / {lf.maxen}'
+    en_str = f'EN  {int(lf.en)}'
     r_en = F11.render(en_str, True, EN_C)
     surf.blit(r_en, (x+PAD, sy)); sy += 13
-    draw_bar(surf, x+PAD, sy, bw, 6, lf.en, lf.maxen, EN_C); sy += 9
+    draw_bar(surf, x+PAD, sy, bw, 6, lf.en, 1, EN_C); sy += 9
 
     # ── Cargas activas con colores y emojis ──────────────────────────
     CARGA_DEFS = [
@@ -2826,7 +3216,7 @@ class GestorCombate:
         # ── Panel Habilidades overlay ─────────────────────────────────
         self.panel_habs.draw(surf)
 
-        # ── Pantalla FIN ──────────────────────────────────────────────
+        # ── Pantalla FIN ────────────────────────────────────────────── psi
         if self.fase == 'fin':
             self._draw_fin(surf)
 
