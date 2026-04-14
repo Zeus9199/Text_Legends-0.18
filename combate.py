@@ -1,16 +1,3 @@
-"""
-combate.py – Text Legends  v3
-=================================
-• Botón "Habilidades" abre mini-menú de soporte (Venda/Cura/Pasto + Energía/Curar/Energiar)
-• Botón "Ataques" abre el menú de ataques del personaje (slot 1/2/3)
-• Botón "Saltar" salta el turno (+4 energía)
-• Botón "Stats" muestra panel de stats detallados (como el motor original)
-• Cargas: sangrado/veneno/quemado/hemorragia/maldita hacen daño real por turno
-• Efectos temporales (stun, hielo, etc.) se decrementan correctamente
-• Build items (casco/armadura/botas) tienen botón propio con cooldown
-• Pasivas reales de cada personaje
-"""
-
 import pygame, os, sys, math
 from random import randint, random
 
@@ -129,7 +116,7 @@ def render_emoji_line(surf, font, text: str, color, x: int, y: int, esize: int =
             i = j
     return cx
 
-# ──────────────────────────────────────────────────────────────────
+# ────────────────────────────────────────────────────────────────── .png
 #  Utilidades de dibujo
 # ────────────────────────────────────────────────────────────────── Luchador
 def draw_rect_alpha(surf, color, rect, alpha=180, radius=6):
@@ -794,16 +781,16 @@ ESCENARIOS = {
     # efecto_tipo: None | 'locura' | 'def_agil' | 'pwr_mago' |
     #              'def_vel_guerrero' | 'vel_misterioso' |
     #              'preci_menos' | 'vel_invertida' | 'energia_inf'
-    1:  ('Pradera',          'fondo_pradera.png',
+    1:  ('Pradera',          'fondo_pradera.webp',
          'Bella pradera — sin efectos especiales.',
          None, 0),
-    2:  ('Pradera',          'fondo_pradera.png',
+    2:  ('Pradera',          'fondo_pradera.webp',
          'Bella pradera — sin efectos especiales.',
          None, 0),
-    3:  ('Pradera',          'fondo_pradera.png',
+    3:  ('Pradera',          'fondo_pradera.webp',
          'Bella pradera — sin efectos especiales.',
          None, 0),
-    4:  ('Caos',             'fondo_locura.png',
+    4:  ('Caos',             'fondo_locura.webp',
          'El caos consume a todos: +20 locura inicial.',
          'locura', 20),
     5:  ('Bosque',           'fondo_bosque.png',
@@ -815,7 +802,7 @@ ESCENARIOS = {
     7:  ('Ciudad',           'fondo_ciudad.png',
          'Ciudad: guerreros +0.2 def y +25 vel.',
          'def_vel_guerrero', (0.2, 25)),
-    8:  ('Metaverso',        'fondo_metaverso.png',
+    8:  ('Metaverso',        'fondo_metaverso.webp',
          'Metaverso: personajes misteriosos +60 vel.',
          'vel_misterioso', 60),
     9:  ('Noche',            'fondo_noche.png',
