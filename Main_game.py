@@ -1563,7 +1563,7 @@ def check_dies (team, total):
             elif cuatro.health <= 0 and cinco.health <= 0 and seis.health <= 0:
                 print ('Players 1, 2 & 3 WIIIIN')
                 exit()
-        elif teams:
+        elif team:
             print ('Work on progress, report this')
             exit()
 
@@ -1650,266 +1650,334 @@ def questinum (qui):
         return equipamiento10
 
 def play(me, howmuch, number):
-    startturn (me)
+    mapa_todos = {
+        'dos':   [uno, dos],
+        'tres':  [uno, dos, tres],
+        'cuatro':[uno, dos, tres, cuatro],
+        'seis':  [uno, dos, tres, cuatro, cinco, seis],
+        'diez':  [uno, dos, tres, cuatro, cinco, seis, siete, ocho, nueve, diez],
+    }
+    todos = mapa_todos[howmuch]
+
+    # Mapa de nombre/número → entidad, para el input del jugador
+    mapa_input = {f'jugador {i+1}': e for i, e in enumerate(todos)}
+    mapa_input.update({e.name.lower(): e for e in todos})
+
+    startturn(me)
     tempo(me)
-    for turnnn in range (1):
+
+    for turnnn in range(1):
+
+        # ── Efectos de campo ─────────────────────────────────────────────────
         if campo.lluvia == 1:
-            uno.cargas['quemado'] = 0
-            dos.cargas['quemado'] = 0
-            if howmuch == 'tres' or howmuch == 'cuatro' or howmuch == 'cinco' or howmuch == 'seis':
-                tres.cargas['quemado'] = 0
-                if howmuch == 'cuatro' or howmuch == 'cinco' or howmuch == 'seis':
-                    cuatro.cargas['quemado'] = 0
-                    if howmuch == 'cinco' or howmuch == 'seis':
-                        cinco.cargas['quemado'] = 0
-                        if howmuch == 'seis':
-                            seis.cargas['quemado'] = 0
-            print ('La lluvia apaga las quemaduras y los moja')
+            for e in todos:
+                e.cargas['quemado'] = 0
+            print('La lluvia apaga las quemaduras y los moja')
+
         elif campo.nevar == 1:
-            nieve = randint (1, 100)
+            nieve = randint(1, 100)
             if nieve <= 20:
                 me.cargas['hielo'] += 1
-                print (me.name, 'se congela durante un turno')
+                print(me.name, 'se congela durante un turno')
             else:
-                print (me.name, 'resiste el frío de la nieve')
+                print(me.name, 'resiste el frío de la nieve')
+
         elif campo.hierba == 1:
-            if me.tipo == 4:
-                cura = me.maxhealth * 0.8 / 100
-                me.health += cura
-                print (me.name, 'se cura', cura, 'de vida gracias al pasto sanador')
-            else:
-                cura = me.maxhealth * 0.5 / 100
-                me.health += cura
-                print (me.name, 'se cura', cura, 'de vida gracias al pasto sanador')
+            mult = 0.8 if me.tipo == 4 else 0.5
+            cura = me.maxhealth * mult / 100
+            me.health += cura
+            print(me.name, 'se cura', cura, 'de vida gracias al pasto sanador')
+
         elif campo.purificador == 1:
-            eliminar_cargas (howmuch)
+            eliminar_cargas(howmuch)
+
         if me.health <= 0:
             break
+
+        # ── Selección de objetivo (jugador humano) ───────────────────────────
+        if me.cargas['stun'] <= 0 and me.cargas['hielo'] <= 0:
+            objective = None
+            while objective is None:
+                print(f'¿Quién es tu objetivo, jugador {number}?')
+                who = input().strip().lower()
+
+                # Runa (caso especial)
+                if who == 'runa':
+                    if runa.runa_on:
+                        objective = runa
+                    else:
+                        print('No hay runa activa')
+                    continue
+
+                # Buscar en el mapa de jugadores
+                target = mapa_input.get(who)
+                if target is None:
+                    print('Objetivo no reconocido, intenta de nuevo')
+                    continue
+
+                if target == me:
+                    print('No puedes seleccionarte a ti mismo como objetivo')
+                    continue
+
+                if target.invisible > 0:
+                    print(f'{target.name} está invisible y no se puede seleccionar')
+                    continue
+
+                if target.mundo != me.mundo:
+                    print(f'{target.name} está en un mundo diferente y no se puede seleccionar')
+                    continue
+
+                objective = target
         else:
-            if me.cargas['stun'] <= 0 and me.cargas['hielo'] <= 0:
-                gagaga = True
-                while gagaga:
-                    if me.cargas['stun'] <= 0 and me.cargas['hielo'] <= 0:
-                        print ('¿Quién es tu objetivo, jugador', number+'?')
-                        who = input () 
-                        if who.lower() == 'jugador 1' or who.lower() == uno.name.lower(): 
-                            if uno.invisible > 0:
-                                print ('El jugador número uno está invisible y no se puede seleccionar')
-                            elif uno.mundo != me.mundo:
-                                print ('El jugador número uno está en un mundo diferente y no se puede seleccionar')
-                            else:
-                                objective = uno
-                                gagaga = False
-                        elif who.lower() == 'runa':
-                            if runa.runa_on:
-                                objective = runa
-                                gagaga = False
-                            else:
-                                print ('No hay runa activa')
-                        elif who.lower() == 'jugador 2':
-                            if dos.invisible > 0:
-                                print ('El jugador número dos está invisible y no se puede seleccionar')
-                            elif dos.mundo != me.mundo:
-                                print ('El jugador número dos está en un mundo diferente y no se puede seleccionar')
-                            else:
-                                objective = dos
-                                gagaga = False
-                        elif who.lower() == 'jugador 3':
-                            if tres.invisible > 0:
-                                print ('El jugador número tres está invisible y no se puede seleccionar')
-                            elif tres.mundo != me.mundo:
-                                print ('El jugador número tres está en un mundo diferente y no se puede seleccionar')
-                            else:
-                                objective = tres
-                                gagaga = False
-                        elif who.lower() == 'jugador 4' :
-                            if cuatro.invisible > 0:
-                                print ('El jugador número cuatro está invisible y no se puede seleccionar')
-                            elif cuatro.mundo != me.mundo:
-                                print ('El jugador número cuatro está en un mundo diferente y no se puede seleccionar')
-                            else:
-                                objective = cuatro
-                                gagaga = False
-                        elif who.lower() == 'jugador 5' :
-                            if cinco.invisible > 0:
-                                print ('El jugador número cinco está invisible y no se puede seleccionar')
-                            elif cinco.mundo != me.mundo:
-                                print ('El jugador número cinco está en un mundo diferente y no se puede seleccionar')
-                            else:
-                                objective = cinco
-                                gagaga = False
-                        elif who.lower() == 'jugador 6':
-                            if seis.invisible > 0:
-                                print ('El jugador número seis está invisible y no se puede seleccionar')
-                            elif seis.mundo != me.mundo:
-                                print ('El jugador número seis está en un mundo diferente y no se puede seleccionar')
-                            else:
-                                objective = seis
-                                gagaga = False
-                        elif who.lower() == 'jugador 7':
-                            if siete.invisible > 0:
-                                print ('El jugador número siete está invisible y no se puede seleccionar')
-                            elif siete.mundo != me.mundo:
-                                print ('El jugador número siete está en un mundo diferente y no se puede seleccionar')
-                            else:
-                                objective = siete
-                                gagaga = False
-                        elif who.lower() == 'jugador 8':
-                            if ocho.invisible > 0:
-                                print ('El jugador número ocho está invisible y no se puede seleccionar')
-                            elif ocho.mundo != me.mundo:
-                                print ('El jugador número ocho está en un mundo diferente y no se puede seleccionar')
-                            else:
-                                objective = ocho
-                                gagaga = False
-                        elif who.lower() == 'jugador 9':
-                            if nueve.invisible > 0:
-                                print ('El jugador número nueve está invisible y no se puede seleccionar')
-                            elif nueve.mundo != me.mundo:
-                                print ('El jugador número nueve está en un mundo diferente y no se puede seleccionar')
-                            else:
-                                objective = nueve
-                                gagaga = False
-                        elif who.lower() == 'jugador 10':
-                            if diez.invisible > 0:
-                                print ('El jugador número diez está invisible y no se puede seleccionar')
-                            elif diez.mundo != me.mundo:
-                                print ('El jugador número diez está en un mundo diferente y no se puede seleccionar')
-                            else:
-                                objective = diez
-                                gagaga = False
-                        
+            objective = uno
+
+        # ── Fenómenos aleatorios ─────────────────────────────────────────────
+        fenomeno = randint(1, 100)
+
+        if fenomeno <= 5:
+            if campo.trrr == 0:
+                terremoto = randint(1, 4)
+                print('Un terremoto sacude la tierra y aturde a todos', terremoto, 'turnos')
+                for e in todos:
+                    e.cargas['stun'] += terremoto
+                campo.trrr = terremoto * 2
             else:
-                objective = uno
-            fenomeno = randint (1, 100) 
-            if fenomeno <= 5:
-                if campo.trrr == 0:
-                    terremoto = randint (1, 4)
-                    print ('Un terremoto sacude la tierra y aturde a todos', terremoto, 'turnos')
-                    uno.cargas['stun'] += terremoto
-                    dos.cargas['stun'] += terremoto
-                    if howmuch == 'tres' or howmuch == 'cuatro' or howmuch == 'cinco' or howmuch == 'seis' or howmuch == 'diez':
-                        tres.cargas['stun'] += terremoto
-                        if howmuch == 'cuatro' or howmuch == 'cinco' or howmuch == 'seis' or howmuch == 'diez':
-                            cuatro.cargas['stun'] += terremoto
-                            if howmuch == 'cinco' or howmuch == 'seis' or howmuch == 'diez':
-                                cinco.cargas['stun'] += terremoto
-                                if howmuch == 'seis' or howmuch == 'diez':
-                                    seis.cargas['stun'] += terremoto
-                                    if howmuch == 'diez':
-                                        siete.cargas['stun'] += terremoto
-                                        ocho.cargas['stun'] += terremoto
-                                        nueve.cargas['stun'] += terremoto
-                                        diez.cargas['stun'] += terremoto
-                    campo.trrr = terremoto * 2
-                else:
-                    campo.trrr -= 1
-            elif fenomeno > 5 and fenomeno <= 12:
-                refuerzos (howmuch)
-            elif fenomeno > 12 and fenomeno <= 15:
-                estampida (howmuch)
-            elif fenomeno > 15 and fenomeno <= 20:
-                ventisca = randint (1, 100)
-                if ventisca <= 40:
-                    print ('Una fuerte ventisca azota a', me.name, ',', me.name, 'resiste y no se congela')
-                elif ventisca > 40 and ventisca <= 75:
-                    print ('Una fuerte ventisca azota a', me.name, ',', me.name, 'se congela 1 turno')
-                    me.cargas['hielo'] += 1
-                elif ventisca > 95:
-                    print ('Una fuerte ventisca azota a', me.name, ',', me.name, 'se congela 3 turnos')
-                    me.cargas['hielo'] += 3
-                else:
-                    print ('Una fuerte ventisca azota a', me.name, ',', me.name, 'se congela 2 turnos')
-                    me.cargas['hielo'] += 2
-            elif fenomeno > 20 and fenomeno <= 24:
-                print ('Unos rayos azotan la arena quebrantando la armadura de ambos contrincantes bajando su defensa en 0.1')
-                uno.defense -= 0.1
-                dos.defense -= 0.1
-                if howmuch == 'tres' or howmuch == 'cuatro' or howmuch == 'cinco' or howmuch == 'seis':
-                    tres.defense -= 0.1
-                    if howmuch == 'cuatro' or howmuch == 'cinco' or howmuch == 'seis':
-                        cuatro.defense -= 0.1
-                        if howmuch == 'cinco' or howmuch == 'seis':
-                            cinco.defense -= 0.1
-                            if howmuch == 'seis':
-                                seis.defense -= 0.1
-            elif fenomeno > 24 and fenomeno <= 29:
-                print ('Tregua. Se realiza una tregua en la cuál todos descansan regenerando 30 de energia')
-                uno.energy += 30
-                dos.energy += 30
-                if howmuch == 'tres' or howmuch == 'cuatro' or howmuch == 'cinco' or howmuch == 'seis':
-                    tres.energy += 30
-                    if howmuch == 'cuatro' or howmuch == 'cinco' or howmuch == 'seis':
-                        cuatro.energy += 30
-                        if howmuch == 'cinco' or howmuch == 'seis':
-                            cinco.energy += 30
-                            if howmuch == 'seis':
-                                seis.energy += 30
-            elif fenomeno > 29 and fenomeno <= 33:
-                print ('Una lluvia ácida cae sobre todos envenenandoles x2')
-                uno.cargas['veneno'] += 2
-                dos.cargas['veneno'] += 2
-                if howmuch == 'tres' or howmuch == 'cuatro' or howmuch == 'cinco' or howmuch == 'seis':
-                    tres.cargas['veneno'] += 2
-                    if howmuch == 'cuatro' or howmuch == 'cinco' or howmuch == 'seis':
-                        cuatro.cargas['veneno'] += 2
-                        if howmuch == 'cinco' or howmuch == 'seis':
-                            cinco.cargas['veneno'] += 2
-                            if howmuch == 'seis':
-                                seis.cargas['veneno'] += 2
-            elif fenomeno > 33 and fenomeno <= 35:
-                print ('Extenuar. Todos quedan extenuados y con 20 de energia menos')
-                uno.energy -= 20
-                dos.energy -= 20
-                if howmuch == 'tres' or howmuch == 'cuatro' or howmuch == 'cinco' or howmuch == 'seis':
-                    tres.energy -= 20
-                    if howmuch == 'cuatro' or howmuch == 'cinco' or howmuch == 'seis':
-                        cuatro.energy -= 20
-                        if howmuch == 'cinco' or howmuch == 'seis':
-                            cinco.energy -= 20
-                            if howmuch == 'seis':
-                                seis.energy -= 20
-            check_capa(me, questinum(me), objective)
+                campo.trrr -= 1
+
+        elif fenomeno <= 12:
+            refuerzos(howmuch)
+
+        elif fenomeno <= 15:
+            estampida(howmuch)
+
+        elif fenomeno <= 20:
+            ventisca = randint(1, 100)
+            if ventisca <= 40:
+                print('Una fuerte ventisca azota a', me.name, ',', me.name, 'resiste y no se congela')
+            elif ventisca <= 75:
+                print('Una fuerte ventisca azota a', me.name, ',', me.name, 'se congela 1 turno')
+                me.cargas['hielo'] += 1
+            elif ventisca <= 95:
+                print('Una fuerte ventisca azota a', me.name, ',', me.name, 'se congela 2 turnos')
+                me.cargas['hielo'] += 2
+            else:
+                print('Una fuerte ventisca azota a', me.name, ',', me.name, 'se congela 3 turnos')
+                me.cargas['hielo'] += 3
+
+        elif fenomeno <= 24:
+            print('Unos rayos azotan la arena quebrantando la armadura de todos bajando su defensa en 0.1')
+            for e in todos:
+                e.defense -= 0.1
+
+        elif fenomeno <= 29:
+            print('Tregua. Se realiza una tregua en la cuál todos descansan regenerando 30 de energia')
+            for e in todos:
+                e.energy += 30
+
+        elif fenomeno <= 33:
+            print('Una lluvia ácida cae sobre todos envenenandoles x2')
+            for e in todos:
+                e.cargas['veneno'] += 2
+
+        elif fenomeno <= 35:
+            print('Extenuar. Todos quedan extenuados y con 20 de energia menos')
+            for e in todos:
+                e.energy -= 20
+
+        # ── Combate ──────────────────────────────────────────────────────────
+        check_capa(me, questinum(me), objective)
+
+        running = True
+        while running:
+            me.turno(objective)
+
             if objective.health <= 0:
-                running = True
-                while running:
-                    me.turno(objective)
-                    if me.health <= 0:
-                        print (me.name, 'murió en su turno')
-                        running = False
-                    if me.armorspell == 1:
-                        ttt = HechizoDeBuild(me, questinum(me), objective, howmuch)
-                        if me.health <= 0:
-                            print (me.name, 'murió en su turno')
-                            running = False
-                        if ttt == False:
-                            running = False
-                        me.armorspell = 0
-                    else:
-                        running = False
+                print(me.name, 'mató a', objective.name)
+                running = False
+            elif me.health <= 0:
+                print(me.name, 'murió en su turno')
+                running = False
+
+            if me.armorspell == 1:
+                ttt = HechizoDeBuild(me, questinum(me), objective, howmuch)
+                if objective.health <= 0:
+                    print(me.name, 'mató a', objective.name)
+                    running = False
+                elif me.health <= 0:
+                    print(me.name, 'murió en su turno')
+                    running = False
+                if ttt == False:
+                    running = False  # corregido: era 'runing' (typo tuyo)
+                me.armorspell = 0
             else:
-                running = True
-                while running:
-                    me.turno(objective)
-                    if objective.health <= 0:
-                        print( me.name,'mató a', objective.name)
-                        running = False
-                    elif me.health <= 0:
-                        print (me.name, 'murió en su turno')
-                        running = False
-                    if me.armorspell == 1:
-                        ttt = HechizoDeBuild(me, questinum(me), objective, howmuch)
-                        if objective.health <= 0:
-                            print( me.name,'mató a', objective.name)
-                            running = False
-                        elif me.health <= 0:
-                            print (me.name, 'murió en su turno')
-                            running = False
-                        if ttt == False:
-                            runing = False
-                        me.armorspell = 0
-                    else:
-                        running = False
+                running = False
+
+# ── Helpers globales ──────────────────────────────────────────────────────────
+
+def calcular_punt(entity):
+    return (50 / (entity.prio + 4)) + (1500 / entity.health)
+
+def mejor_objetivo(candidatos):
+    """Mayor puntuación; desempate por mayor health."""
+    return max(candidatos, key=lambda e: (calcular_punt(e), e.health))
+
+def get_equipos(todos, team):
+    """Devuelve lista de equipos según el modo de juego."""
+    if not team:                 return [[e] for e in todos]          # FFA
+    if team is True:             return [todos[:2], todos[2:4]]       # 2v2
+    if team == '3v3':            return [todos[:3], todos[3:6]]       # 3v3
+    if team == '2v2v2':          return [todos[:2], todos[2:4], todos[4:6]]
+    if team == '1v1v1':          return [[todos[0]], [todos[1]], [todos[2]]]
+    if team == '1v1v1v1':        return [[e] for e in todos[:4]]
+    if team == '5v5':            return [todos[:5], todos[5:10]]
+    if team == '2v2v2v2v2':      return [todos[i:i+2] for i in range(0, 10, 2)]
+    if team == 'ffa10':          return [[e] for e in todos]
+    return [[e] for e in todos]  # fallback FFA
+
+def seleccionar_objetivo(me, todos, team):
+    """
+    Devuelve el mejor objetivo para 'me'.
+    - Soporte (healer/FSD) en equipo real → elige entre sus aliados.
+    - Cualquier otro caso → elige entre sus enemigos.
+    """
+    equipos   = get_equipos(todos, team)
+    mi_equipo = next(eq for eq in equipos if me in eq)
+    es_soporte = me.rol in ('healer', 'FSD')
+
+    if es_soporte and len(mi_equipo) > 1:
+        candidatos = mi_equipo       
+    else:
+        candidatos = [e for e in todos if e not in mi_equipo]
+
+    return mejor_objetivo(candidatos)
+
+
+
+def playIA(me, howmuch, number, team):
+    mapa_todos = {
+        'dos':   [uno, dos],
+        'tres':  [uno, dos, tres],
+        'cuatro':[uno, dos, tres, cuatro],
+        'seis':  [uno, dos, tres, cuatro, cinco, seis],
+        'diez':  [uno, dos, tres, cuatro, cinco, seis, siete, ocho, nueve, diez],
+    }
+    todos = mapa_todos[howmuch]
+
+    startturn(me)
+    tempo(me)
+
+    for turnnn in range(1):
+        if campo.lluvia == 1:
+            for e in todos:
+                e.cargas['quemado'] = 0
+            print('La lluvia apaga las quemaduras y los moja')
+
+        elif campo.nevar == 1:
+            nieve = randint(1, 100)
+            if nieve <= 20:
+                me.cargas['hielo'] += 1
+                print(me.name, 'se congela durante un turno')
+            else:
+                print(me.name, 'resiste el frío de la nieve')
+
+        elif campo.hierba == 1:
+            mult = 0.8 if me.tipo == 4 else 0.5
+            cura = me.maxhealth * mult / 100
+            me.health += cura
+            print(me.name, 'se cura', cura, 'de vida gracias al pasto sanador')
+
+        elif campo.purificador == 1:
+            eliminar_cargas(howmuch)
+
+        if me.health <= 0:
+            break
+
+        if me.cargas['stun'] <= 0 and me.cargas['hielo'] <= 0:
+            objective = seleccionar_objetivo(me, todos, team)
+        else:
+            objective = uno 
+
+        fenomeno = randint(1, 100)
+
+        if fenomeno <= 5:
+            if campo.trrr == 0:
+                terremoto = randint(1, 4)
+                print('Un terremoto sacude la tierra y aturde a todos', terremoto, 'turnos')
+                for e in todos:
+                    e.cargas['stun'] += terremoto
+                campo.trrr = terremoto * 2
+            else:
+                campo.trrr -= 1
+
+        elif fenomeno <= 12:
+            refuerzos(howmuch)
+
+        elif fenomeno <= 15:
+            estampida(howmuch)
+
+        elif fenomeno <= 20:
+            ventisca = randint(1, 100)
+            if ventisca <= 40:
+                print('Una fuerte ventisca azota a', me.name, ',', me.name, 'resiste y no se congela')
+            elif ventisca <= 75:
+                print('Una fuerte ventisca azota a', me.name, ',', me.name, 'se congela 1 turno')
+                me.cargas['hielo'] += 1
+            elif ventisca <= 95:
+                print('Una fuerte ventisca azota a', me.name, ',', me.name, 'se congela 2 turnos')
+                me.cargas['hielo'] += 2
+            else:
+                print('Una fuerte ventisca azota a', me.name, ',', me.name, 'se congela 3 turnos')
+                me.cargas['hielo'] += 3
+
+        elif fenomeno <= 24:
+            print('Unos rayos azotan la arena quebrantando la armadura de todos bajando su defensa en 0.1')
+            for e in todos:
+                e.defense -= 0.1
+
+        elif fenomeno <= 29:
+            print('Tregua. Se realiza una tregua en la cuál todos descansan regenerando 30 de energia')
+            for e in todos:
+                e.energy += 30
+
+        elif fenomeno <= 33:
+            print('Una lluvia ácida cae sobre todos envenenandoles x2')
+            for e in todos:
+                e.cargas['veneno'] += 2
+
+        elif fenomeno <= 35:
+            print('Extenuar. Todos quedan extenuados y con 20 de energia menos')
+            for e in todos:
+                e.energy -= 20
+
+        check_capa(me, questinum(me), objective)
+
+        running = True
+        while running:
+            me.turnoIA(objective)
+
+            murio_objetivo = objective.health <= 0
+            murio_yo       = me.health <= 0
+
+            if murio_objetivo:
+                print(me.name, 'mató a', objective.name)
+                running = False
+            elif murio_yo:
+                print(me.name, 'murió en su turno')
+                running = False
+
+            if me.armorspell == 1:
+                ttt = HechizoDeBuild(me, questinum(me), objective, howmuch)
+                if objective.health <= 0:
+                    print(me.name, 'mató a', objective.name)
+                    running = False
+                elif me.health <= 0:
+                    print(me.name, 'murió en su turno')
+                    running = False
+                if ttt == False:
+                    running = False
+                me.armorspell = 0
+            else:
+                running = False
 
 def playatraco (me, howmuch):
     startturn (me)
@@ -2092,7 +2160,7 @@ def playatraco (me, howmuch):
                         running = False
 
 class Hero ():
-    def __init__ (self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
+    def __init__ (self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
         self.name = name
         self.maxhealth = maxhealth
         self.health = maxhealth #número
@@ -2131,6 +2199,9 @@ class Hero ():
         self.armorspell = 0
         self.robovida = robovida
         self.invisible = invisible
+        self.rol = rol
+        self.prio = prio
+        self.att1 = 0
 
     def canplay (self, enemy):
         if campo.sol == 1:
@@ -2397,6 +2468,75 @@ class Hero ():
             self.energy += 3
         printdatos(self, enemy)
 
+    def _robovida_clamp(self):
+        self.robovida = max(0, min(1, self.robovida))
+
+    def _aplicar_robovida(self, dano):
+        self._robovida_clamp()
+        robado = dano * self.robovida
+        if robado != 0:
+            print(self.name, 'roba', robado, 'de vida')
+            self.health += robado
+
+    def _check_paralizado(self):
+        """Devuelve True si puede actuar, False si queda paralizado."""
+        if self.cargas['paralizado'] > 0:
+            paraliza = randint(0, 100)
+            self.cargas['paralizado'] -= 1
+            if paraliza <= 40:
+                print(self.name, 'está paralizado y no puede hacer nada')
+                return False
+            else:
+                print(self.name, 'no se paraliza')
+        return True
+
+    def _check_inmovilizado(self):
+        """Devuelve True si puede moverse, False si está inmovilizado."""
+        if self.cargas['inmovilizado'] > 0:
+            print(self.name, 'está inmovilizado y no puede atacar')
+            self.cargas['inmovilizado'] -= 1
+            return False
+        return True
+
+    def _puede_usar(self, coste_energia, indice_cooldown=None, requiere_no_silenciado=False, requiere_moverse=False):
+        """
+        Comprueba si una habilidad puede usarse sin modificar nada.
+        requiere_moverse=True → también comprueba inmovilizado (ataques melé/físicos).
+        """
+        if requiere_no_silenciado and self.cargas['silenciado'] > 0:
+            return False
+        if requiere_moverse and self.cargas['inmovilizado'] > 0:
+            return False
+        if self.energy <= coste_energia:
+            return False
+        if indice_cooldown is not None and self.cooldown[indice_cooldown] > campo.nturnos:
+            return False
+        return True
+
+    def turnoIA(self, enemy):
+        """Punto de entrada IA. Gestiona estados comunes y delega en _elegir_accion_IA."""
+        if self.health <= 0:
+            return
+        if not self.canplay(enemy):
+            return
+
+        cargas(self)
+
+        # Silenciado: descuenta y sigue (puede usar ataques físicos)
+        if self.cargas['silenciado'] > 0:
+            self.cargas['silenciado'] -= 1
+
+        # Paralizado: puede bloquear el turno
+        if not self._check_paralizado():
+            return
+
+        self._elegir_accion_IA(enemy)
+
+    def _elegir_accion_IA(self, enemy):
+        """Cada subclase sobreescribe este método con su propia prioridad."""
+        pass
+
+
     def printinfo(self, enemy):
         print ('La precisión del ataque uno es de: ', self.preci1, '%')
         print ('La precisión del ataque dos es de: ', self.preci1, '%')
@@ -2413,8 +2553,8 @@ class Hero ():
         print ('Estás invisible por', self.invisible, 'turnos')
 
 class Warrior (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Guerrero')
@@ -2757,12 +2897,119 @@ class Warrior (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-tank = Warrior ('Kenric', 2500, 120, 0.95, 1.2, 42, 100, 95, 95, 100, 100, 1, 1, 0, 0, 0, 60, 0, 0)
-guerrero = Warrior ('Kenric', 1740, 130, 1.2, 0.975, 42, 100, 120, 95, 100, 100, 1, 1, 1, 0, 0, 30, 0, 0)
+        
+    def _ia_caballero_o_furia(self, enemy):
+        if not self._puede_usar(60, 2, requiere_no_silenciado=True):
+            return False
+        if self.mutado == 0:
+            self.power += 0.05  # pasiva juicio final
+        elif self.mutado == 1:
+            self.defense += 0.025
+        hit = randint(0, 100)
+        if hit > self.preci3:
+            print(self.name, 'falla la super!')
+            self.energy += -30 + 2
+        else:
+            if self.mutado == 0:
+                print(self.name, 'aplica escudo a', enemy.name, ', le da', 160 * self.power, 'de vida y +0.2 defensa')
+                for i in range(4):
+                    if enemy.efecto[i] == '':
+                        enemy.efecto[i] = 'escudo'; enemy.efecton[i] = enemy.health
+                        enemy.tiempo[i] = campo.nturnos + 3; enemy.health += 160 * self.power; break
+                enemy.defense += 0.2
+            else:
+                print(self.name, 'entra en furia, aumenta su poder en 4 por 1 turno')
+                for i in range(4):
+                    if self.efecto[i] == '':
+                        self.efecto[i] = 'apower'; self.efecton[i] = 4
+                        self.tiempo[i] = campo.nturnos + 2; self.power += 4; break
+            self.energy += -60 + 2
+        self.cooldown[2] = campo.nturnos + (3 if self.mutado == 0 else 4)
+        printdatos(self, enemy)
+        return True
+
+    def _ia_estocada(self, enemy):
+        if not self._puede_usar(45, 1, requiere_no_silenciado=True, requiere_moverse=True):
+            return False
+        if self.mutado == 0: self.power += 0.05
+        elif self.mutado == 1: self.defense += 0.025
+        hit = randint(0, 100)
+        if hit > self.preci2:
+            print(self.name, 'falla la estocada!')
+            self.energy += -17 + 2
+        else:
+            if self.locura > 0 and randint(1, 100) < self.locura:
+                dano = 101 * self.power / self.defense
+                print('La locura lleva a', self.name, 'a atravesarse con su espada, se inflige', dano, 'de daño')
+                self.health -= dano
+            else:
+                dano = 101 * self.power / enemy.defense
+                if enemy.cargas['invencible'] == 1: dano = 0
+                reflejo = dano * enemy.reflejar
+                dano_total = dano - reflejo
+                enemy.health -= dano_total
+                self.health -= reflejo
+                self._aplicar_robovida(dano_total)
+                print(self.name, 'clava una estocada en', enemy.name, ', le inflige', dano_total, 'de daño')
+            self.energy += -45 + 2
+        printdatos(self, enemy)
+        return True
+
+    def _ia_tajo(self, enemy):
+        if not self._puede_usar(2, requiere_moverse=True):
+            return False
+        if self.mutado == 0: self.power += 0.05
+        elif self.mutado == 1: self.defense += 0.025
+        hit = randint(0, 100)
+        if hit > self.preci1:
+            print(self.name, 'falla el tajo!')
+            self.energy += -1 + 2
+        else:
+            if self.locura > 0 and randint(1, 100) < self.locura:
+                dano = 30 * self.power / self.defense
+                sng = randint(0, 100)
+                print('La locura lleva a', self.name, 'a hacerse un tajo, se inflige', dano, 'de daño')
+                self.health -= dano
+                if sng <= 70: self.cargas['sangrado'] += 1
+            else:
+                dano = 30 * self.power / enemy.defense
+                if enemy.cargas['invencible'] == 1: dano = 0
+                reflejo = dano * enemy.reflejar
+                dano_total = dano - reflejo
+                enemy.health -= dano_total
+                self.health -= reflejo
+                self._aplicar_robovida(dano_total)
+                sng = randint(0, 100)
+                print(self.name, 'da un tajo a', enemy.name, ', le inflige', dano_total, 'de daño')
+                if sng <= 70:
+                    print(self.name, 'inflige un sangrado en', enemy.name)
+                    enemy.cargas['sangrado'] += 1
+            self.energy += -2 + 2
+        dacac(self, enemy)
+        printdatos(self, enemy)
+        return True
+
+    def _elegir_accion_IA(self, enemy):  # Warrior
+        # Super: caballero buffea al aliado más débil (soporte), furia se la usa a sí mismo
+        if self._ia_caballero_o_furia(enemy): return
+        # Ataque 2
+        if self._ia_estocada(enemy): return
+        # Ataque básico con límite de att1
+        if self.att1 >= 3:
+            self.att1 = 0
+            super().energia(enemy)
+            return
+        if self._ia_tajo(enemy):
+            self.att1 += 1
+            return
+        super().energia(enemy)
+
+tank = Warrior ('Kenric', 2500, 120, 0.95, 1.2, 42, 100, 95, 95, 100, 100, 1, 1, 0, 0, 0, 60, 0, 0, 'DPS', 4)
+guerrero = Warrior ('Kenric', 1740, 130, 1.2, 0.975, 42, 100, 120, 95, 100, 100, 1, 1, 1, 0, 0, 30, 0, 0, 'DPS', 3)
 
 class Magician (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Mago')
@@ -3085,11 +3332,11 @@ class Magician (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-mago = Magician('Gandalf', 1580, 170, 1, 1, 30, 100, 80, 75, 100, 100, 3, 1, 0, 0, 0, 30, 0, 0)
+mago = Magician('Gandalf', 1580, 170, 1, 1, 30, 100, 80, 75, 100, 100, 3, 1, 0, 0, 0, 30, 0, 0, 'DPS', 3)
 
 class Hereje (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Ágil')
@@ -3420,11 +3667,11 @@ class Hereje (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-arquero = Hereje('Alaric', 1700, 145, 1, 1, 59, 100, 80, 75, 100, 100, 2, 1, 0, 0, 0, 0, 0, 0)
+arquero = Hereje('Alaric', 1700, 145, 1, 1, 59, 100, 80, 75, 100, 100, 2, 1, 0, 0, 0, 0, 0, 0, 'DPS', 2)
 
 class Maldi (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Mago')
@@ -3769,11 +4016,11 @@ class Maldi (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-maldito = Maldi ('Drago', 1530, 180, 1, 1, 16, 89, 79, 99, 100, 100, 3, 1, 0, 0, 0, 30, 0, 0)
+maldito = Maldi ('Drago', 1530, 180, 1, 1, 16, 89, 79, 99, 100, 100, 3, 1, 0, 0, 0, 30, 0, 0, 'DPS', 3)
 
 class Thief (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Ágil')
@@ -4334,11 +4581,11 @@ class Thief (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-robador = Thief('Leoric', 1850, 160, 1, 1, 65, 120, 85, 70, 80, 100, 2, 1, 0, 0, 0, 30, 0, 3)
+robador = Thief('Leoric', 1850, 160, 1, 1, 65, 120, 85, 70, 80, 100, 2, 1, 0, 0, 0, 30, 0, 3, 'DPS', 3)
 
 class Shapeshifter (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci11, preci2, preci22, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci11, preci2, preci22, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
         self.preci11 = preci11
         self.preci22 = preci22
         self.carga_cambiaforma = 0
@@ -4846,11 +5093,11 @@ class Shapeshifter (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-pantera = Shapeshifter('Hildegund', 2100, 300, 1, 1, 33, 85, 120, 85, 90, 200, 100, 100, 3, 1, 0, 0, 0, 35, 0, 0)
+pantera = Shapeshifter('Hildegund', 2100, 300, 1, 1, 33, 85, 120, 85, 90, 200, 100, 100, 3, 1, 0, 0, 0, 35, 0, 0, 'DPS', 4)
 
 class Healer (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Maga')
@@ -5077,12 +5324,87 @@ class Healer (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-curandera = Healer('Hawise', 1700, 200, 1, 1, 35, 100, 80, 85, 100, 100, 3, 1, 0, 0, 0, 50, 0, 0)
+
+    def _ia_proteger(self, enemy):
+        if not self._puede_usar(100, 2, requiere_no_silenciado=True):
+            return False
+        hit = randint(1, 100)
+        if hit >= self.preci3:
+            print(self.name, 'falla proteger!')
+            self.energy += -50 + 4
+        else:
+            print(self.name, 'protege a', enemy.name, ', le cura', 300 * self.power * self.lcura * enemy.rcura, 'de vida y +0.1 poder y defensa')
+            enemy.health += 300 * self.power * self.lcura * enemy.rcura
+            enemy.power += 0.1
+            enemy.defense += 0.1
+            self.energy += -100 + 4
+        self.cooldown[2] = campo.nturnos + 4
+        printdatos(self, enemy)
+        return True
+
+    def _ia_bendecir(self, enemy):
+        if not self._puede_usar(60, 1, requiere_no_silenciado=True):
+            return False
+        hit = randint(0, 100)
+        if hit > self.preci2:
+            print(self.name, 'falla bendecir!')
+            self.energy += -30 + 4
+        else:
+            print(self.name, 'bendice a', enemy.name, ', +0.3 defensa y +0.5 cura recibida por 2 turnos')
+            for efx, val, attr in [('adefense', 0.3, 'defense'), ('arcura', 0.5, 'rcura')]:
+                for i in range(5):
+                    if enemy.efecto[i] == '':
+                        enemy.efecto[i] = efx; enemy.efecton[i] = val
+                        enemy.tiempo[i] = campo.nturnos + 3
+                        setattr(enemy, attr, getattr(enemy, attr) + val)
+                        break
+            self.energy += -60 + 4
+        self.cooldown[1] = campo.nturnos + 4
+        printdatos(self, enemy)
+        return True
+
+    def _ia_heal(self, enemy):
+        if not self._puede_usar(40, 0):
+            return False
+        hit = randint(0, 100)
+        if hit > self.preci1:
+            print(self.name, 'falla heal!')
+            self.energy += -20 + 4
+        else:
+            print(self.name, 'cura', 100 * self.power * self.lcura * enemy.rcura, 'de vida a', enemy.name, 'y le quita 1 hemorragia y 1 maldición')
+            enemy.health += 100 * self.power * self.lcura * enemy.rcura
+            if enemy.cargas['hemorragia'] > 0: enemy.cargas['hemorragia'] -= 1
+            if enemy.cargas['maldita'] > 0: enemy.cargas['maldita'] -= 1
+            self.energy += -40 + 4
+        printdatos(self, enemy)
+        return True
+
+    def _elegir_accion_IA(self, enemy):  # Healer
+        # 1. Super si el aliado está muy bajo (<30% vida)
+        if enemy.health < enemy.maxhealth * 0.30:
+            if self._ia_proteger(enemy): return
+        # 2. Bendecir si el aliado no tiene el buff (no gastar si ya lo tiene)
+        tiene_adefense = any(enemy.efecto[i] == 'adefense' for i in range(5))
+        if not tiene_adefense:
+            if self._ia_bendecir(enemy): return
+        # 3. Heal básico
+        if self.att1 >= 3:
+            self.att1 = 0
+            super().energia(enemy)
+            return
+        if self._ia_heal(enemy):
+            self.att1 += 1
+            return
+        # 4. Proteger si tiene energía aunque el aliado no esté crítico
+        if self._ia_proteger(enemy): return
+        super().energia(enemy)
+
+curandera = Healer('Hawise', 1700, 200, 1, 1, 35, 100, 80, 85, 100, 100, 3, 1, 0, 0, 0, 50, 0, 0, 'healer', 1)
 
 
 class Mace (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
     def print_info(self):
         print ('Tipo: Guerrero')
         print('Nivel de salud:', self.health)
@@ -5412,11 +5734,11 @@ class Mace (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-maza = Mace ('Björn', 1980, 220, 1, 1.1, 39, 90, 95, 85, 100, 100, 1, 1, 0, 0, 0, 55, 0, 0)
+maza = Mace ('Björn', 1980, 220, 1, 1.1, 39, 90, 95, 85, 100, 100, 1, 1, 0, 0, 0, 55, 0, 0, 'DPS', 4)
 
 class Fires (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Ágil')
@@ -5634,11 +5956,11 @@ class Fires (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-igneo = Fires('Finnian', 1630, 130, 1, 1, 64, 80, 90, 100, 100, 100, 2, 1, 0, 0, 0, 30, 0, 0)
+igneo = Fires('Finnian', 1630, 130, 1, 1, 64, 80, 90, 100, 100, 100, 2, 1, 0, 0, 0, 30, 0, 0, 'DPS', 3)
 
 class Snake_Charmer(Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Ágil')
@@ -5930,11 +6252,11 @@ class Snake_Charmer(Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-serpientero = Snake_Charmer('Rayder', 1900, 140, 1, 1, 58, 120, 80, 95, 100, 100, 2, 1, 0, 0, 0, 30, 0, 0)
+serpientero = Snake_Charmer('Rayder', 1900, 140, 1, 1, 58, 120, 80, 95, 100, 100, 2, 1, 0, 0, 0, 30, 0, 0, 'DPS', 3)
 
 class Apostador(Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
         self.sombra = 1
 
     def print_info(self):
@@ -6126,11 +6448,11 @@ class Apostador(Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-poker = Apostador('@#-·-#@', 1820, 10, 1, 1, 29, 300, 300, 300, 100, 100, 0, 1, 0, 0, 0, 60, 0, 0)
+poker = Apostador('@#-·-#@', 1820, 10, 1, 1, 29, 300, 300, 300, 100, 100, 0, 1, 0, 0, 0, 60, 0, 0, 'DPS+buff', 3)
 
 class Natural (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Natural')
@@ -6391,12 +6713,12 @@ class Natural (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-natural = Natural ('Groa', 1600, 220, 1, 1, 37, 100, 90, 120, 100, 100, 4, 1, 0, 0, 0, 40, 0, 0)
-natural_heal = Natural ('Groa', 1600, 220, 1, 1, 37, 100, 90, 120, 100, 100, 4, 1, 1, 0, 0, 45, 0, 0)
+natural = Natural ('Groa', 1600, 220, 1, 1, 37, 100, 90, 120, 100, 100, 4, 1, 0, 0, 0, 40, 0, 0, 'DPS+healer', 1)
+natural_heal = Natural ('Groa', 1600, 220, 1, 1, 37, 100, 90, 120, 100, 100, 4, 1, 1, 0, 0, 45, 0, 0, 'healer', 1)
 
 class Diablillo (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Ágil')
@@ -6603,11 +6925,11 @@ class Diablillo (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-diablillo = Diablillo('Gillmore', 2000, 145, 1, 1, 75, 100, 90, 90, 100, 100, 2, 1, 0, 0, 0, 35, 0, 0)
+diablillo = Diablillo('Gillmore', 2000, 145, 1, 1, 75, 100, 90, 90, 100, 100, 2, 1, 0, 0, 0, 35, 0, 0, 'DPS', 3)
 
 class Support (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
         self.cargado = ''
         self.cargadocooldown = 0
 
@@ -6869,11 +7191,11 @@ class Support (Hero):
                             else:
                                 self.cargado.health -= 500
                                 print (self.cargado.name, 'se quita 500 de vida debido a la repentina bajada de poder')
-support = Support ('Wymond', 1780, 180, 1, 1, 36, 120, 120, 200, 100, 100, 3, 1, 0, 0, 0, 28, 0, 0)
+support = Support ('Wymond', 1780, 180, 1, 1, 36, 120, 120, 200, 100, 100, 3, 1, 0, 0, 0, 28, 0, 0, 'FSD', 2)
 
 class Chiquitin(Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: misterioso')
@@ -7088,11 +7410,11 @@ class Chiquitin(Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-chiquitin = Chiquitin('$)¬"#@', 400, 10, 1, 1, 32, 120, 90, 75, 100, 100, 0, 1, 0, 0, 0, 20, 0, 0)
+chiquitin = Chiquitin('$)¬"#@', 400, 10, 1, 1, 32, 120, 90, 75, 100, 100, 0, 1, 0, 0, 0, 20, 0, 0, 'DPS+buff', 3)
 
 class Guadana (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Guerrero')
@@ -7345,11 +7667,11 @@ class Guadana (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-guadana = Guadana ('Dustin', 1930, 310, 1, 1, 40, 100, 85, 95, 100, 100, 1, 1, 0, 0, 0, 30, 0, 0)
+guadana = Guadana ('Dustin', 1930, 310, 1, 1, 40, 100, 85, 95, 100, 100, 1, 1, 0, 0, 0, 30, 0, 0, 'DPS', 3)
 
 class Crossbow (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
         self.count1 = 0
         
     def print_info(self):
@@ -7372,7 +7694,7 @@ class Crossbow (Hero):
         print ('NUEVO HÉROE. Con su brillante ballesta aparece, ¡', self.name, '!', '\n')
         self.print_info()
     def turno(self, enemy):
-        for herejeee in range (1):
+        for crossbowww in range (1):
             if self.health <= 0:
                 pass
             else:
@@ -7684,11 +8006,115 @@ class Crossbow (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-ballesta = Crossbow('Burchard', 1760, 178, 1, 1, 37, 100, 90, 90, 100, 100, 1, 1, 0, 0, 0, 30, 0, 0)
+
+    def _ia_disparo_explosivo(self, enemy):
+        if not self._puede_usar(90, 2, requiere_no_silenciado=True):
+            return False
+        hit = randint(0, 100)
+        if hit > self.preci3:
+            print(self.name, 'falla disparo explosivo!')
+            self.energy += -45 + 3
+        else:
+            if self.locura > 0 and randint(1, 100) < self.locura:
+                dano = 50 * self.power / self.defense
+                print('Debido a la locura', self.name, 'se clava una flecha bomba, se inflige', dano, 'de daño')
+                self.health -= dano
+                for i in range(4):
+                    if self.efecto[i] == '':
+                        self.efecto[i] = 'daño'; self.efecton[i] = 350; self.tiempo[i] = campo.nturnos + 2; break
+            else:
+                dano = 50 * self.power / enemy.defense
+                if enemy.cargas['invencible'] == 1: dano = 0
+                print(self.name, 'clava una flecha bomba en', enemy.name, ', inflige', dano, 'de daño. En 1 turno explota y hará', 350 * self.power)
+                enemy.health -= dano
+                self._aplicar_robovida(dano)
+                for i in range(4):
+                    if enemy.efecto[i] == '':
+                        enemy.efecto[i] = 'daño'; enemy.efecton[i] = 350 * self.power; enemy.tiempo[i] = campo.nturnos + 2; break
+        self.energy += -90 + 2
+        self.cooldown[2] = campo.nturnos + 5
+        printdatos(self, enemy)
+        return True
+
+    def _ia_eliminador_de_ruido(self, enemy):
+        if not self._puede_usar(40, 1, requiere_no_silenciado=True):
+            return False
+        hit = randint(0, 100)
+        if hit > self.preci2:
+            print(self.name, 'falla eliminador de ruido!')
+            self.energy += -20 + 2
+        else:
+            if self.locura > 0 and randint(1, 100) < self.locura:
+                dano = 120 * self.power / self.defense
+                print('A causa de la locura', self.name, 'se clava una flecha en el torso, se inflige', dano, 'de daño y se silencia 2 turnos')
+                self.health -= dano
+                self.cargas['silenciado'] += 2
+            else:
+                dano = 120 * self.power / enemy.defense
+                if enemy.cargas['invencible'] == 1: dano = 0
+                print(self.name, 'dispara a', enemy.name, ', le inflige', dano, 'de daño y le silencia 2 turnos')
+                enemy.health -= dano
+                self._aplicar_robovida(dano)
+                enemy.cargas['silenciado'] += 2
+            self.energy += -40 + 2
+        self.cooldown[1] = campo.nturnos + 4
+        printdatos(self, enemy)
+        return True
+
+    def _ia_flecha_explosiva(self, enemy):
+        if not self._puede_usar(3, 0):
+            return False
+        hit = randint(0, 100)
+        if hit > self.preci1:
+            print(self.name, 'falla flecha explosiva!')
+            self.energy += -7.5 + 2
+            printdatos(self, enemy)
+            return True
+        if self.locura > 0 and randint(1, 100) < self.locura:
+            dano = 90 * self.power / self.defense
+            print('A causa de la locura', self.name, 'explota una flecha en el pie, se inflige', dano, 'de daño')
+            self.health -= dano
+            self.count1 += 1
+            if self.count1 >= 3:
+                self.health -= dano
+                self.count1 = 0
+                print('Segunda flecha en el pie,', self.name, 'se inflige', dano, 'de daño')
+        else:
+            dano = 90 * self.power / enemy.defense
+            if enemy.cargas['invencible'] == 1: dano = 0
+            print(self.name, 'dispara una flecha explosiva a', enemy.name, ', le inflige', dano, 'de daño')
+            enemy.health -= dano
+            self._aplicar_robovida(dano)
+            self.count1 += 1
+            if self.count1 >= 3:
+                dano2 = 90 * self.power / enemy.defense
+                if enemy.cargas['invencible'] == 1: dano2 = 0
+                print('Segunda flecha explosiva a', enemy.name, ', le inflige', dano2, 'de daño')
+                enemy.health -= dano2
+                self._aplicar_robovida(dano2)
+                self.count1 = 0
+        self.energy += -15 + 2
+        printdatos(self, enemy)
+        return True
+
+    def _elegir_accion_IA(self, enemy):  
+        if self._ia_disparo_explosivo(enemy): return
+        if enemy.cargas['silenciado'] <= 0:
+            if self._ia_eliminador_de_ruido(enemy): return
+        if self.att1 >= 3:
+            self.att1 = 0
+            super().energia(enemy)
+            return
+        if self._ia_flecha_explosiva(enemy):
+            self.att1 += 1
+            return
+        super().energia(enemy)
+
+ballesta = Crossbow('Burchard', 1760, 178, 1, 1, 37, 100, 90, 90, 100, 100, 1, 1, 0, 0, 0, 30, 0, 0, 'DPS', 4)
 
 class Loco(Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: misterioso')
@@ -7880,11 +8306,11 @@ class Loco(Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-locoloco = Loco('Fiiuuuu', 1888, 18, 1, 1, 46, 99, 200, 500, 100, 100, 0, 1, 0, 0, 0, 20, 0, 0)
+locoloco = Loco('Fiiuuuu', 1888, 18, 1, 1, 46, 99, 200, 500, 100, 100, 0, 1, 0, 0, 0, 20, 0, 0, 'DPS+buff', 2)
 
 class Root (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
         self.conexionado = ''
         self.conexinv = ''
         self.conechealth = 0
@@ -8128,11 +8554,11 @@ class Root (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-raiz = Root ('Haywood', 2200, 260, 1, 1, 62, 100, 90, 400, 100, 100, 4, 1, 0, 0, 0, 40, 0, 0)
+raiz = Root ('Haywood', 2200, 260, 1, 1, 62, 100, 90, 400, 100, 100, 4, 1, 0, 0, 0, 40, 0, 0, 'DPS+supof', 3)
 
 class SantaClaus(Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Misterioso')
@@ -8446,11 +8872,11 @@ class SantaClaus(Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-papanoel = SantaClaus('Santa Claus', 1790, 15, 1, 1, 32, 120, 90, 75, 100, 100, 0, 1, 0, 0, 0, 25, 0, 0)
+papanoel = SantaClaus('Santa Claus', 1790, 15, 1, 1, 32, 120, 90, 75, 100, 100, 0, 1, 0, 0, 0, 25, 0, 0, 'FSO', 3)
 
 class Werewolf (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def print_info(self):
         print ('Tipo: Salvaje')
@@ -8752,11 +9178,11 @@ class Werewolf (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-werewolf = Werewolf('Romulus', 1860, 280, 1, 1, 76, 100, 90, 95, 100, 100, 5, 1, 0, 0, 0, 35, 0.08, 0)
+werewolf = Werewolf('Romulus', 1860, 280, 1, 1, 76, 100, 90, 95, 100, 100, 5, 1, 0, 0, 0, 35, 0.08, 0, 'DPS', 3)
 
 class Runeforge (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
         self.vida_runa = 380
         self.pr_normal = 50
         self.pr_bueno = 30
@@ -8983,11 +9409,11 @@ class Runeforge (Hero):
                     else:
                         print ('Mal', '\n')
                         self.turno (enemy)
-herrero = Runeforge ('Torvak', 1930, 310, 1, 1, 40, 100, 200, 200, 100, 100, 1, 1, 0, 0, 0, 30, 0, 0)
+herrero = Runeforge ('Torvak', 1930, 310, 1, 1, 40, 100, 200, 200, 100, 100, 1, 1, 0, 0, 0, 30, 0, 0, 'DPS+supdef', 2)
 
 class Serenita (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
         self.constancia = 1
         self.costanza = 30 * self.constancia
         self.tconstancia = 0
@@ -9253,11 +9679,11 @@ class Serenita (Hero):
                     else:
                         print ('Male', '\n')
                         self.turno (enemy)
-her = Serenita('Elena', 1550, 200, 1, 1, 38, 110, 110, 110, 100, 100, 3, 1, 0, 0, 0, 60, 0, 0)
+her = Serenita('Elena', 1550, 200, 1, 1, 38, 110, 110, 110, 100, 100, 3, 1, 0, 0, 0, 60, 0, 0, 'healer', 1)
 
 class BoxBlue (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
 
     def turno (self):
         boxblue.nturnos += 1
@@ -9266,11 +9692,11 @@ class BoxBlue (Hero):
             self.cargas['hielo'] -= 1
         else:
             cargas(self)
-boxblue = BoxBlue ('Caja Azul', 2000, 1000000, 1, 5, 0, 100, 100, 100, 100, 100, 10, 1, 0, 0, 0, 90, 0, 0)
+boxblue = BoxBlue ('Caja Azul', 2000, 1000000, 1, 5, 0, 100, 100, 100, 100, 100, 10, 1, 0, 0, 0, 90, 0, 0, 'caja', 0.5)
 
 class BoxRed (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
         
     def turno (self):
         boxred.nturnos += 1
@@ -9279,11 +9705,11 @@ class BoxRed (Hero):
             self.cargas['hielo'] -= 1
         else:
             cargas(self)
-boxred = BoxRed ('Caja Roja', 2000, 1000000, 1, 5, 0, 100, 100, 100, 100, 100, 10, 1, 0, 0, 0, 90, 0, 0)
+boxred = BoxRed ('Caja Roja', 2000, 1000000, 1, 5, 0, 100, 100, 100, 100, 100, 10, 1, 0, 0, 0, 90, 0, 0, 'caja', 0.5)
 
 class bichos (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
    
     def turno (self, enemy): # enemy = LISTA jugador/es
         agros = list()
@@ -9294,11 +9720,11 @@ class bichos (Hero):
         ataque = randint (1, 4)
         if self.tipo == 0:
             pass
-bichoprueba = bichos ('Bicho Prueba', 2000, 1000000, 1, 5, 0, 100, 100, 100, 100, 100, 10, 1, 0, 0, 0, 90, 0, 0)
+bichoprueba = bichos ('Bicho Prueba', 2000, 1000000, 1, 5, 0, 100, 100, 100, 100, 100, 10, 1, 0, 0, 0, 90, 0, 0, 'bicho', 1)
 
 class Externos (Hero):
-    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible):
-        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible)
+    def __init__(self, name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio):
+        super().__init__(name, maxhealth, energy, power, defense, velocity, preci1, preci2, preci3, precicura, precienergia, tipo, mundo , mutado, locura, reflejar, agro, robovida, invisible, rol, prio)
         self.runa_on = False
         self.runa_own = ''
     def recibir_dano_runa (self, damage):
@@ -9309,7 +9735,7 @@ class Externos (Hero):
             self.runa_on = False
         else:
             print(f"¡La runa absorbió el daño! Le quedan {self.health} de vida.")
-runa = Externos('runa', 400, 100, 1, 1, 0, 100, 100, 100, 100, 100, 10, 1 , 0, 0, 0, 20, 0, 0)
+runa = Externos('runa', 400, 100, 1, 1, 0, 100, 100, 100, 100, 100, 10, 1 , 0, 0, 0, 20, 0, 0, 'runa', 1)
 
 class equips():
     def __init__(self, casco, armadura, botas, capa, amuleto, cooldowncasco, cooldownarmaduras, cooldownbotas, cooldowncapa):
@@ -11792,3 +12218,125 @@ elif cuantosplayers.lower() == '1':
         elif uno.health <= 0:
             print ('Perdiste :(')
             break 
+
+if cuantosplayers == '2ia':
+    numjuga.numjug = 2
+    uno = input('Jugador 1, escoja su personaje: Warrior, Warrior Tank, Magician, Hereje, Maldi, Thief, Shapeshifter, Mace, Fires, Snake Charner, Apostador, Natural, Diablillo, Chiquitin, Guadaña, Crossbow, Loco, Root, Santa Claus, Werewolf, Runeforge')
+    if uno.lower() == 'build':
+        equipbuild (equipamiento1, uno)
+        uno = input('Jugador 1, escoja su personaje:')
+    check_personaje(uno)
+
+    dos = 'crossbow'
+
+    mapping = {
+    'warrior': guerrero, 'magician': mago, 'hereje': arquero, 'maldi': maldito, 'thief': robador, 'shapeshifter': pantera,
+    'healer': curandera, 'mace': maza, 'fires': igneo, 'snake charner': serpientero, 'apostador': poker, 'natural': natural,
+    'diablillo': diablillo, 'support': support, 'chiquitin': chiquitin, 'guadaña': guadana, 'crossbow': ballesta, 'loco': locoloco,
+    'root': raiz, 'santa claus': papanoel, 'werewolf': werewolf, 'natural heal': natural_heal, 'warrior tank': tank, 'runeforge': herrero, 'serenita' : her, 'serenità' : her
+    }
+
+    def translate(value):
+        return mapping.get(value.lower(), value)
+
+    uno = translate(uno)
+    dos = translate(dos)
+    jugadores = [uno, dos]
+    aplicar_amuletos(jugadores)
+    escenario = randint (1, 11)
+    if escenario == 1 or escenario == 2 or escenario == 3:
+        print ('La pelea se desarrolla en una bella pradera (no pasa nada)')
+    elif escenario == 4:
+        print ('¡¡La pelea es una locura!! El caos consume a los jugadores aumentando su locura en 20')
+        players = [uno, dos]
+        for i in players:
+            i.locura += 20
+    elif escenario == 5:
+        print ('La pelea se desarrolla en un bosque entre sus árboles los personajes ágiles reciben 0.25 más de defensa')
+        players = [uno, dos]
+        for i in players:
+            if i.tipo == 2:
+                print (i.name, 'recibe 0.25 más de defensa')
+                i.defense += 0.25
+    elif escenario == 6:
+        print ('La pelea se desarrolla además en una segunda dimención psiquica por donde las mentes de los magos se pueden mover afectando aún más en sus ataques (los magos tienen 0.25 más de poder)')
+        players = [uno, dos]
+        for i in players:
+            if i.tipo == 3:
+                print (i.name, 'recibe 0.25 más de poder')
+                i.power += 0.25
+    elif escenario == 7:
+        print ('La pelea se desarrolla en una ciudad donde los guerreros tienen cobijo y se saben los caminos por lo que aumentan su defensa en 0.2 y su velocidad en 25')
+        players = [uno, dos]
+        for i in players:
+            if i.tipo == 1:
+                print (i.name, 'recibe 0.2 más de defensa y 25 más de velocidad')
+                i.defense += 0.2
+                i.velocity += 25
+    elif escenario == 8:
+        print ('La pelea se desarrolla además en el metaverso donde los personajes misteriosos son muy veloces (aumentan su velocidad en 60)')
+        players = [uno, dos]
+        for i in players:
+            if i.tipo == 0:
+                print (i.name, 'recibe 60 más de velocidad')
+                i.velocity += 60
+    elif escenario == 9:
+        print ('La pelea se desarrolla por la noche por lo que su visión empeora reduciendo sus precisiones en 20%')
+        players = [uno, dos]
+        for i in players:
+            i.preci1 -= 20
+            i.preci2 -= 20
+            i.preci3 -= 20
+            i.precicura -= 20
+            i.precienergia -= 20
+    elif escenario == 11:
+        print ('Una infinita fuente de energia abastece a todos los personajes con 100k de energia')
+        players = [uno, dos]
+        for i in players:
+            i.energy += 100000
+    elif escenario == 10:
+        print ('La pelea está patas arriba y los menos veloces atacan primero')
+        uno.hello()
+        dos.hello()
+        while uno.health >= 0 or dos.health >= 0:
+            velocities = list()
+            velocities.append (uno.velocity)
+            velocities.append (dos.velocity)
+            velocities.sort()
+            second = velocities [1]
+            first = velocities [0]
+            players = [first, second]
+            for i in players:
+                if i == uno.velocity:
+                    play (uno, 'dos', '1')
+                if i == dos.velocity:
+                    playIA (dos, 'dos', '2', False)
+                if uno.health <= 0 and dos.health <= 0:
+                    print ('EMPATE. ¿¿Cómo?? JAJAJAJA')
+                elif dos.health <= 0:
+                    print ('Jugador 1 WIIIIN')
+                elif uno.health <= 0:
+                    print ('Jugador 2 WIIIIN')
+
+    if escenario != 10:
+        uno.hello()
+        dos.hello()
+        while uno.health >= 0 or dos.health >= 0:
+            velocities = list()
+            velocities.append (uno.velocity)
+            velocities.append (dos.velocity)
+            velocities.sort()
+            first = velocities [1]
+            second = velocities [0]
+            players = [first, second]
+            for i in players:
+                if i == uno.velocity:
+                    play (uno, 'dos', '1')
+                if i == dos.velocity:
+                    playIA (dos, 'dos', '2', False)
+                if uno.health <= 0 and dos.health <= 0:
+                    print ('EMPATE. ¿¿Cómo?? JAJAJAJA')
+                elif dos.health <= 0:
+                    print ('Jugador 1 WIIIIN')
+                elif uno.health <= 0:
+                    print ('Jugador 2 WIIIIN')
