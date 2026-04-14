@@ -6,7 +6,7 @@ from combate import GestorCombate
 
 pygame.init()
 
-descripcion_objetos = {
+descripcion_objetos = { 
     "Hábito de monje": "Regenera 120 de energia durante 3 turnos, tiene un cooldown de 6 turnos",
     "Capucha de niebla": "Silencia a todos los personajes (incluyendote) durante 3 turnos, tiene un cooldown de 8 turnos y gasta 20 de energia",
     "Casco de truenos": "Lanza rayos en todas direcciones infligiendo 120 de daño y aturdiendo 1 turno, tiene un cooldown de 7 turnos y gasta 36 de energia",
@@ -315,7 +315,7 @@ def dibujar_resumen():
     button_volver.draw(screen)
     button_combate.draw(screen)   #
 
-# Bucle principal
+# Bucle principal .png
 running = True
 while running:
     if game_state['screen'] != 'combate':
